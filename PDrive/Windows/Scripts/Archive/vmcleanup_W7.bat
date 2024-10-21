@@ -1,0 +1,1 @@
+powershell -ExecutionPolicy "Bypass" -file \\wkmjbmedl\e\scripts\vmcleanup_W7.ps1

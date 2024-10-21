@@ -1,0 +1,2 @@
+﻿Add-PSSnapin citrix.*
+Get-BrokerDesktop -AdminAddress 'LOUXDCWPGX1S003.ts.humad.com:80' –MaxRecordCOunt 10000 | Select-Object @{l='UserName';e={$_.AssociatedUserNames}} , @{l='FullName';e={$_.AssociatedUserFullNames}}, DNSName, MachineName , AgentVersion , LastConnectionTime , LastConnectionUser , RegistrationState ,HostingServerName, ControllerDNSName, InMaintenanceMode , PowerState | Export-Csv C:\temp\all76VMs.csv

@@ -1,0 +1,59 @@
+@echo off
+set logloc="F:\program files\ca\dsm\logs\sms_extract.log"
+echo.SMS Extract routine start > %logloc%
+date /t >> %logloc%
+time /t >> %logloc%
+echo. >> %logloc%
+
+echo.Deleting AssetCollectorBAK files >> %logloc%
+date /t >> %logloc%
+time /t >> %logloc%
+echo. >> %logloc%
+
+echo y | del "F:\Program Files\CA\DSM\AssetCollectorBAK\*.*"
+
+echo.Deleting AssetCollectorOutput files >> %logloc%
+date /t >> %logloc%
+time /t >> %logloc%
+echo. >> %logloc%
+
+echo y | del "F:\Program Files\CA\DSM\AssetCollectorOutput\*.*"
+
+echo.Stopping CAF >> %logloc%
+date /t >> %logloc%
+time /t >> %logloc%
+echo. >> %logloc%
+
+caf kill assetcollector
+caf kill collectengine
+caf stop
+
+echo.Launching CORA Cleanup >> %logloc%
+date /t >> %logloc%
+time /t >> %logloc%
+echo. >> %logloc%
+
+cd /d "F:\program files\ca\sc\cora"
+coracleanup /SERVER LOUSQLWQS60.rsc.humad.com /SCOPE ALL /METHOD REINIT /DATABASE MDB /TYPE SQLSERVER /USERNAME ca_itrm /LOG FULL /PASSWORD ********
+
+cd /d "F:\program files\ca\dsm\scripts"
+
+echo.Starting CAF >> %logloc%
+date /t >> %logloc%
+time /t >> %logloc%
+echo. >> %logloc%
+
+caf start
+
+echo.Starting Hardware + Software Extract >> %logloc%
+date /t >> %logloc%
+time /t >> %logloc%
+echo. >> %logloc%
+
+REM Hardware + Software extract
+"F:\program files\ca\dsm\bin\am_sms_ex.exe" /s:LOUAPPWPS207.rsc.humad.com /u:humad\ecmadmin /p:******** /c:HUM /D:"F:\Program Files\CA\DSM\AssetCollectorCollect" /trustlevel:4 /r:"F:\Program Files\CA\DSM\logs\am_sms_ex_hw.log" /collect_hw /collect_sw
+
+echo.SMS Extract routine end >> %logloc%
+date /t >> %logloc%
+time /t >> %logloc%
+echo. >> %logloc%

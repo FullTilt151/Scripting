@@ -1,0 +1,138 @@
+function Repair-CmnClientCert {
+    [Cmdletbinding()]
+    PARAM(
+        [Parameter(Mandatory = $true, HelpMessage = 'List of computers to repair')]
+        [String[]]$computers
+    )
+    foreach ($computer in $computers) {
+        if (Test-Connection -ComputerName $computer -quiet -Count 1) {
+            Write-Verbose -Message "Fixing $computer"
+            Invoke-Command -ComputerName $computer -ScriptBlock { $smsCertTB = (Get-Content -Path 'C:\WINDOWS\SMSCFG.ini' | Where-Object { $_ -match 'Certificate Identifier' }) -replace 'SMS Certificate Identifier=SMS;'
+
+                $smsCert = (Get-ChildItem -Path Cert:\LocalMachine\SMS | Where-Object { $_.Thumbprint -eq $smsCertTB }).Subject
+
+                if ($smsCert -notmatch $env:COMPUTERNAME) {
+
+                    Get-ChildItem -Path Cert:\LocalMachine\SMS | Where-Object { $_.Thumbprint -eq $smsCertTB } | Remove-Item
+
+                    Restart-Service -Name CcmExec -Force -ErrorAction SilentlyContinue
+
+                } }
+        }
+        else { Write-Verbose -Message "Unable to contact $computer" }
+    }
+    Get-PSSession
+}
+$computers = ('SIMXDWDIGW328',
+'SIMXDWDIGW329',
+'SIMXDWDIGW330',
+'SIMXDWDIGW331',
+'SIMXDWDIGW332',
+'SIMXDWDIGW333',
+'SIMXDWDIGW334',
+'SIMXDWDIGW336',
+'SIMXDWDIGW338',
+'SIMXDWDIGW340',
+'SIMXDWDIGW342',
+'SIMXDWDIGW345',
+'SIMXDWDIGW346',
+'SIMXDWDIGW347',
+'SIMXDWDIGW348',
+'SIMXDWDIGW349',
+'SIMXDWDIGW350',
+'SIMXDWDIGW351',
+'SIMXDWDIGW352',
+'SIMXDWDIGW354',
+'SIMXDWDIGW355',
+'SIMXDWDIGW356',
+'SIMXDWDIGW357',
+'SIMXDWDIGW358',
+'SIMXDWDIGW359',
+'SIMXDWDIGW360',
+'SIMXDWDIGW362',
+'SIMXDWDIGW363',
+'SIMXDWDIGW364',
+'SIMXDWDIGW366',
+'SIMXDWDIGW368',
+'SIMXDWDIGW369',
+'SIMXDWDIGW370',
+'SIMXDWDIGW373',
+'SIMXDWDIGW374',
+'SIMXDWDIGW375',
+'SIMXDWDIGW376',
+'SIMXDWDIGW377',
+'SIMXDWDIGW378',
+'SIMXDWDIGW380',
+'SIMXDWDIGW381',
+'SIMXDWDIGW382',
+'SIMXDWDIGW383',
+'SIMXDWDIGW384',
+'SIMXDWDIGW385',
+'SIMXDWDIGW386',
+'SIMXDWDIGW387',
+'SIMXDWDIGW389',
+'SIMXDWDIGW391',
+'SIMXDWDIGW392',
+'SIMXDWDIGW393',
+'SIMXDWDIGW394',
+'SIMXDWDIGW395',
+'SIMXDWDIGW396',
+'SIMXDWDIGW398',
+'SIMXDWDIGW399',
+'SIMXDWDIGW400',
+'SIMXDWDIGW402',
+'SIMXDWDIGW404',
+'SIMXDWDIGW406',
+'SIMXDWDIGW407',
+'SIMXDWDIGW408',
+'SIMXDWDIGW409',
+'SIMXDWDIGW410',
+'SIMXDWDIGW412',
+'SIMXDWDIGW413',
+'SIMXDWDIGW414',
+'SIMXDWDIGW416',
+'SIMXDWDIGW417',
+'SIMXDWDIGW421',
+'SIMXDWDIGW422',
+'SIMXDWDIGW423',
+'SIMXDWDIGW424',
+'SIMXDWDIGW425',
+'SIMXDWDIGW426',
+'SIMXDWDIGW427',
+'SIMXDWDIGW428',
+'SIMXDWDIGW429',
+'SIMXDWDIGW430',
+'SIMXDWDIGW432',
+'SIMXDWDIGW433',
+'SIMXDWDIGW434',
+'SIMXDWDIGW435',
+'SIMXDWDIGW436',
+'SIMXDWDIGW438',
+'SIMXDWDIGW439',
+'SIMXDWDIGW440',
+'SIMXDWDIGW441',
+'SIMXDWDIGW442',
+'SIMXDWDIGW444',
+'SIMXDWDIGW445',
+'SIMXDWDIGW446',
+'SIMXDWDIGW448',
+'SIMXDWDIGW449',
+'SIMXDWDIGW450',
+'SIMXDWDIGW451',
+'SIMXDWDIGW452',
+'SIMXDWDIGW453',
+'SIMXDWDIGW454',
+'SIMXDWDIGW455',
+'SIMXDWDIGW456',
+'SIMXDWDIGW458',
+'SIMXDWDIGW459',
+'SIMXDWDIGW460',
+'SIMXDWDIGW461',
+'SIMXDWDIGW462',
+'SIMXDWDIGW463',
+'SIMXDWDIGW464',
+'SIMXDWDIGW465',
+'SIMXDWDIGW466',
+'SIMXDWDIGW467',
+'SIMXDWDIGW468')
+Repair-CmnClientCert -computers $computers -Verbose

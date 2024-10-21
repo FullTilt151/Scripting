@@ -1,0 +1,1 @@
+& 'C:\Program Files\1E\NomadBranch\NomadBranch.exe' -PreCache

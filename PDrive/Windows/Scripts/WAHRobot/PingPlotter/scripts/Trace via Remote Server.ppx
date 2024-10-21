@@ -1,0 +1,370 @@
+PingPlotter Script V4.00
+ScriptType=Engine
+Language=VBScript
+DefaultEnabled=0
+This script allows you to connect to a remote Windows or Unix agent and us that
+machine as the "source" for the trace.  For more details about this (including
+downloads of the remote agent software), see our instructions at
+http://www.pingplotterpro.com/remote_trace.html.
+
+---- Do not edit this line, or anything above it ----
+
+option explicit
+
+' Set up the default.  This needs to be changed to a real server by the user
+' in the options screen!
+dim DefaultInitialServer
+
+DefaultInitialServer = "http://(servername):7465/"
+
+' Build the editor
+sub GetEditor(EditorForm)
+
+  dim RowTop 
+  RowTop = 3
+  
+  dim EditControlLeft
+  
+  ' Create a label in the dialog
+  with TLabel.Create( EditorForm )
+	  .Top = RowTop
+	  .Caption = "Enter URL to remote trace server: "
+	  .Left = 3
+	  .Parent = EditorForm
+	  EditControlLeft = .Left + .width + 5
+	End With
+
+  ' Create the remote target address edit
+  with TEdit.Create( EditorForm )
+    .Name = "editURL" ' Setting a name means we have easy access to it later.
+  	.Text = ""  ' Inititialize this to blank - we don't have config settings yet.
+  	.Top = 0
+  	.Parent = EditorForm
+  	.Left = EditControlLeft
+  	.Anchors = SetMake(akTop, akRight, akLeft)
+  	' .Anchors = akTop + akRight + akLeft
+  	.Width = EditorForm.Width - (.Left + 5)
+  	.Hint = "Use the form http://servername:7464/ for a Windows agent, or http://servername/path/script.pl for Unix." & vbCRLF & "Note: SSL (https addresses) is not supported."
+  	RowTop = RowTop + .Height + 2
+  End With
+  
+  with TLabel.Create( EditorForm )
+  	.Caption = "Basic authentication settings (leave blank if no authentication used):"
+  	.Top = RowTop
+  	.Left = 3
+  	.Parent = EditorForm
+  	RowTop = RowTop + .Height + 5
+  End With
+  
+  ' Create the username and password edit controls
+  with TLabel.Create( EditorForm )
+    .Caption = "Username:"
+    .Left = 10
+    .Top = RowTop + 2
+    .Parent = EditorForm
+    EditControlLeft = .Width + .Left + 10
+  End With
+  
+  with TEdit.Create( EditorForm )
+    .Name = "editRemoteUsername"
+    .Left = EditControlLeft
+    .Text = ""
+    .Top = RowTop
+    .Parent = EditorForm
+    .Width = 100
+    .Hint = "If the remote server requires a username and password (basic authentication only), enter the username here."
+    RowTop = RowTop + .Height + 3
+  End With
+  
+  ' Create the username and password edit controls
+  with TLabel.Create( EditorForm )
+    .Caption = "Password:"
+    .Left = 10
+    .Top = RowTop + 2
+    .Parent = EditorForm
+  End With
+  
+  with TEdit.Create( EditorForm )
+    .Name = "editRemotePassword"
+    .Left = EditControlLeft
+    .PasswordChar = asc("*")
+    .Text = ""
+    .Top = RowTop
+    .Parent = EditorForm
+    .Width = 100
+    .Hint = "The (basic authentication) password to access the remote server."
+    RowTop = RowTop + .Height + 3
+  End With
+  
+  EditorForm.Caption = " Remote Server Source Settings "
+  EditorForm.Padding.Bottom = 6
+  EditorForm.Autosize = false
+  EditorForm.ClientHeight = RowTop + 15
+  
+  Events.SetEvent EditorForm, "OnLoadFields", "OnLoadFields"
+  Events.SetEvent EditorForm, "OnApply", "OnApply"
+  
+end sub
+
+' This gets called on two occasions.
+' 1) When the editor is initializing
+' 2) When the system wants to know if anything has changed.
+' These are in the same routine to make the set and compare logic in the
+' same place.
+function OnLoadFields(EditorForm, ChangeCheckOnly)
+
+  dim ChangeCount
+  ChangeCount = 0  ' How many changes do we have in queue?
+  
+  dim TargetServer
+  TargetServer = EditorForm.ConfigSettings.EngineData.AdditionalSettings("RemoteHTTPEngineTarget")
+  if TargetServer = "" then
+    TargetServer = DefaultInitialServer
+  end if
+
+  if not ChangeCheckOnly then
+    EditorForm.editURL.Text = TargetServer
+  else
+    if (EditorForm.editURL.Text <> EditorForm.ConfigSettings.EngineData.AdditionalSettings("RemoteHTTPEngineTarget")) then
+      ChangeCount = ChangeCount + 1
+    end if
+  end if
+  
+  if not ChangeCheckOnly then
+    EditorForm.editRemoteUsername.Text = EditorForm.ConfigSettings.EngineData.AdditionalSettings("RemoteHTTPUsername")
+  else
+    if (EditorForm.editRemoteUsername.Text <> EditorForm.ConfigSettings.EngineData.AdditionalSettings("RemoteHTTPUsername")) then
+      ChangeCount = ChangeCount + 1
+    end if
+  end if
+  
+  if not ChangeCheckOnly then
+    EditorForm.editRemotePassword.Text = EditorForm.ConfigSettings.EngineData.AdditionalSettings("RemoteHTTPPassword")
+  else
+    if (EditorForm.editRemotePassword.Text <> EditorForm.ConfigSettings.EngineData.AdditionalSettings("RemoteHTTPPassword")) then
+      ChangeCount = ChangeCount + 1
+    end if
+  end if
+  
+  OnLoadFields = ChangeCount
+
+end function
+
+' This gets called when the "Apply" button is hit, or when the form is closed.
+' This needs to write any data values out to the engine data system so it gets
+' reloaded.  The engine itself needs to use this value.
+sub OnApply(EditorForm)
+  EditorForm.ConfigSettings.EngineData.AdditionalSettings("RemoteHTTPEngineTarget") = EditorForm.editURL.Text
+  EditorForm.ConfigSettings.EngineData.AdditionalSettings("RemoteHTTPUsername") = EditorForm.editRemoteUsername.Text
+  EditorForm.ConfigSettings.EngineData.AdditionalSettings("RemoteHTTPPassword") = EditorForm.editRemotePassword.Text
+end sub
+
+'New Trace Properties
+'   property IPAddress: ShortString read FIPAddress write FIPAddress;
+'   property TargetName: ShortString read FTargetName write FTargetName;
+'   property CurMaxHops: Integer read FCurMaxHops write FCurMaxHops;
+'   property SampleNum: Integer read FSampleNum write FSampleNum;
+'   property NeedName: Boolean read FNeedName write FNeedName;
+'   property StartDelay: Integer read FStartDelay write FStartDelay;
+'   property NotifyHandle: THandle read FNotifyHandle write FNotifyHandle;
+'   property TimeoutTime: Integer read FTimeoutTime write FTimeoutTime;
+'   property ToSByte: Byte read FToSByte write FToSByte;
+'   property PacketType: TPacketType read FPacketType write FPacketType;
+'   property EngineSettings: TEngineSettings read FEngineSettings write FEngineSettings;
+
+dim gNewTrace
+
+private Response
+private re
+
+sub InitializeEngine( )
+  set Response = TScriptedTraceResponse.Create( null )
+  Response.ScriptOwnsObject = true
+  set re = New Regexp
+end sub
+
+Sub DoneEngine( )
+  set gNewTrace = Nothing
+  set re = Nothing
+  set Response = Nothing
+end sub
+
+' This is called when we get something back from the web server (or when
+sub OnReadLine(Stream, NewString)
+  ' See if the new string is in the format of " HOP IPAdress Latency " or " HOP * " (timeout)
+
+  ' Don't supress error handling..  It's been disabled on the "GET" call, so any errors here won't be
+  ' reported unless we do the goto 0 thing...
+  on error goto 0
+
+  ' Examples:
+  ' Hop (IP - v4 or v6) (optional hostname) latency'
+  ' Note that the hostname must be secondary (IP must be there) and it needs to be surrounded by parenthesis'
+  ' 7 9.10.11.12 (hostname) 15 ms
+  ' 2 fe80::1 25 ms
+  ' 8 *       -- A timeout usually just has a *, but could have other text that needs to be ignored.
+
+  re.Pattern = "\s*(\d+)\s+(\*|((\d+\.\d+\.\d+\.\d+)|(([A-Fa-f0-9]{1,4}::?){1,7}[A-Fa-f0-9]{1,4}))\s+(\([^\)]*\)\s+)?(\d+\.?\d*))"
+'  re.Pattern = "\s*(\d+)\s+(\*|(\d+\.\d+\.\d+\.\d+)|(([A-Fa-f0-9]{1,4}::?){1,7}[A-Fa-f0-9]{1,4})\s+(\([^\)]*\)\s+)?(\d+\.?\d*))"
+'
+  re.Global = true
+
+  dim Match
+  set Match = re.Execute( NewString )
+
+  dim Router
+  for each Router in Match
+
+    dim Value
+
+    Response.Hop = Router.submatches(0)
+    Response.SampleNum = gNewTrace.SampleNum
+
+    if Router.submatches(1) = "*" then
+      Response.ReachedAddress = ""
+      Response.ElapsedTime = ppSAMPLETIMEOUT
+      Response.ResponseType = rtError
+    else
+      Response.ReachedAddress = Router.submatches(2)
+
+      ' Submatch 3 is the optional parameter for name (which could show up as an IP even with -n in some case).
+      Response.ElapsedTime = Round( Router.submatches(7) )
+      if Response.ReachedAddress = gNewTrace.IPAddress then
+         Response.ResponseType = rtReachedDestination
+      else
+         Response.ResponseType = rtIntermediateHop
+      end if
+    end if
+
+
+  '  rtError = 0;
+  '  rtReachedDestination = 1;
+  '  rtUnreachable = 2;
+  '  rtIntermediateHop = 3;
+
+    Response.Message = ""
+    Response.TargetAddress = gNewTrace.IPAddress
+
+    gNewTrace.Reply(Response)
+  next
+
+  set Match = Nothing
+
+end sub
+
+sub ProcessRequest(NewTrace)
+
+  dim HTTPRequest
+
+  ' Don't supress error handling..
+  on error goto 0
+  Err.Clear
+
+  set gNewTrace = NewTrace
+
+  ' Read the target server!
+  ' *** IMPORTANT *** All settings should be read-only.  The engine settings
+  ' are not - write-safe as there are multiple threads involved.
+
+  dim TargetServer
+  dim EngineSettings
+
+  set EngineSettings = NewTrace.EngineSettings
+  TargetServer = EngineSettings.AdditionalSettings("RemoteHTTPEngineTarget")
+
+  if TargetServer = "" then
+    RaiseException("There is no target server configured!")
+  end if
+
+  set HTTPRequest =  TppHTTP.Create( null )
+  HTTPRequest.ScriptOwnsObject = true ' get rid of the lookup as soon as we're done with it here.
+
+  Events.SetEvent HTTPRequest, "OnReadLine", "OnReadLine"
+
+  HTTPRequest.Request.BasicAuthentication = true
+  HTTPRequest.Request.Username = EngineSettings.AdditionalSettings("RemoteHTTPUsername")
+  HTTPRequest.Request.Password = EngineSettings.AdditionalSettings("RemoteHTTPPassword")
+
+  ' If we're using a Proxy server, get it from our main configuration and
+  ' configure it here.
+  if NewTrace.EngineSettings.GlobalData.ProxyServer > "" then
+    HTTPRequest.ProxyParams.BasicAuthentication = true
+    HTTPRequest.ProxyParams.ProxyServer = EngineSettings.GlobalData.ProxyServer
+    HTTPRequest.ProxyParams.ProxyPort = EngineSettings.GlobalData.ProxyPort
+    HTTPRequest.ProxyParams.ProxyUsername = EngineSettings.GlobalData.ProxyUsername
+    HTTPRequest.ProxyParams.ProxyPassword = EngineSettings.GlobalData.ProxyPassword
+  else
+    HTTPRequest.ProxyParams.ProxyServer = ""
+  end if
+
+  ' We need to give some timeout that we're willing to wait.  This needs to be enough time
+  ' for the remote side to be busy, so we're default to one minute.
+  HTTPRequest.ReadTimeout = 60000
+
+  dim Params
+  Params = "IP=" & NewTrace.IPAddress
+  Params = Params & "&TimeoutTime=" & EngineSettings.TimeoutTime
+  Params = Params & "&ThreadHitDelay=" & EngineSettings.ThreadHitDelay
+  Params = Params & "&PacketSize=" & EngineSettings.PacketSizeIPv4
+  Params = Params & "&UniqueID=" & NewTrace.EngineUniqueID
+  if EngineSettings.ToSByte > 0 then
+    Params = Params & "&ToSByte=" & EngineSettings.ToSByte
+  end if
+  if EngineSettings.StoredStartingHop <> 1 then
+    Params = Params & "&StartingHop=" & EngineSettings.StoredStartingHop
+  end if
+
+  ' Parse the URL and add parameters.
+  dim URL, URLParser
+  set URLParser = TidURI.Create
+  URLParser.ScriptOwnsObject = true ' Set the scope so the underlying object gets destroyed when script is done with it.
+
+  URLParser.URI = TargetServer
+
+  if (URLParser.Params > "") then
+    URLParser.Params = URLParser.Params & "&" & Params
+  else
+    URLParser.Params = Params
+  end if
+
+  URL = URLParser.URI
+  set URLParser = Nothing
+
+  ' Get won't return until the request is complete.  We'll get callbacks
+  ' on "OnReadLine", though.
+  on error resume next
+  HTTPRequest.Get URL
+
+  URL = ""
+
+  ' If there's any error connecting to the server, it will be
+  ' returned here.  Log the message back to the server...
+
+  ' 503 means the agent couldn't service us, so ignore this request and try again next
+  ' time.
+  If ((Err.Number <> 0) or (HTTPRequest.ResponseCode >= 400)) and (HTTPRequest.ResponseCode <> 503) then
+
+    Response.Hop = 1
+    Response.ReachedAddress = gNewTrace.IPAddress
+    Response.ElapsedTime = ppROUTECHANGE
+
+    Response.SampleNum = gNewTrace.SampleNum
+    Response.ResponseType = rtError
+    if HTTPRequest.ResponseCode >= 400 then
+      Response.Message = HTTPRequest.ResponseText
+    else
+      Response.Message = Err.Description
+    end if
+    Response.TargetAddress = gNewTrace.IPAddress
+    gNewTrace.Reply(Response)
+  end if
+
+  Err.Clear
+  on error goto 0
+
+  Events.SetEvent HTTPRequest, "OnReadLine", ""
+
+  set gNewTrace = Nothing
+  set HTTPRequest = Nothing
+
+end sub

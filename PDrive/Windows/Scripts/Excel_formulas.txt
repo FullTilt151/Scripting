@@ -1,0 +1,8 @@
+Compare two columns
+=IF(ISERROR(MATCH(A2,$B$2:$B$7000,0)),"","X")
+
+VLOOKUP
+=VLOOKUP(A9,A1:B7,2,FALSE)
+
+Daily report
+=IF(LEFT(A2, 8)="R2:000010","REQ","INC")

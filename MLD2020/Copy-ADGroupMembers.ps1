@@ -1,0 +1,1 @@
+﻿Add-ADGroupMember -Identity 'T_MEMCM_ServerPatching_Ops_SQ' -Members (Get-ADGroupMember -Identity 'T_MEMCM_ServerPatching_Ops_SP' -Recursive)

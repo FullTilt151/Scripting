@@ -1,0 +1,1 @@
+﻿& cscript \\wkmj029cw9\shared\software\WMIDiag\WMIDiag.vbs SMS LogFilePath=\\wkmj029cw9\shared\logs\WMIDiag Silent NoEcho LogWMIState

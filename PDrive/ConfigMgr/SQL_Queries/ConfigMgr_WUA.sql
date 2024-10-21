@@ -1,0 +1,41 @@
+select case sys.Operating_System_Name_and0
+		when 'Microsoft Windows NT Advanced Server 10.0' then 'Server 2016'
+		when 'Microsoft Windows NT Server 10.0' then 'Server 2016'
+		when 'Microsoft Windows NT Advanced Server 5.2' then 'Server 2003'
+		when 'Microsoft Windows NT Advanced Server 6.0' then 'Server 2008'
+		when 'Microsoft Windows NT Server 6.0' then 'Server 2008'
+		when 'Microsoft Windows NT Advanced Server 6.1' then 'Server 2008 R2'
+		when 'Microsoft Windows NT Server 6.1' then 'Server 2008 R2'
+		when 'Microsoft Windows NT Server 6.2' then 'Server 2012'
+		when 'Microsoft Windows NT Advanced Server 6.3' then 'Server 2012 R2'
+		when 'Microsoft Windows NT Server 6.3' then 'Server 2012 R2'	
+		when 'Microsoft Windows NT Workstation 5.1' then 'Windows XP'
+		when 'Microsoft Windows NT Workstation 6.1' then 'Windows 7'
+		when 'Microsoft Windows NT Workstation 6.1 (Tablet Edition)' then 'Windows 7'
+		when 'Microsoft Windows NT Workstation 6.1 (Embedded)' then 'Windows 7'
+		when 'Microsoft Windows NT Workstation 10.0' then 'Windows 10'
+		when 'Microsoft Windows NT Workstation 10.0 (Tablet Edition)' then 'Windows 10'
+		else 'Unknown'
+	   end [OS], sys.Operating_System_Name_and0, LastWUAVersion, count(*)
+from v_R_System_Valid sys join
+	 v_UpdateScanStatus uss on sys.ResourceID = uss.ResourceID
+group by case sys.Operating_System_Name_and0
+		when 'Microsoft Windows NT Advanced Server 10.0' then 'Server 2016'
+		when 'Microsoft Windows NT Server 10.0' then 'Server 2016'
+		when 'Microsoft Windows NT Advanced Server 5.2' then 'Server 2003'
+		when 'Microsoft Windows NT Advanced Server 6.0' then 'Server 2008'
+		when 'Microsoft Windows NT Server 6.0' then 'Server 2008'
+		when 'Microsoft Windows NT Advanced Server 6.1' then 'Server 2008 R2'
+		when 'Microsoft Windows NT Server 6.1' then 'Server 2008 R2'
+		when 'Microsoft Windows NT Server 6.2' then 'Server 2012'
+		when 'Microsoft Windows NT Advanced Server 6.3' then 'Server 2012 R2'
+		when 'Microsoft Windows NT Server 6.3' then 'Server 2012 R2'	
+		when 'Microsoft Windows NT Workstation 5.1' then 'Windows XP'
+		when 'Microsoft Windows NT Workstation 6.1' then 'Windows 7'
+		when 'Microsoft Windows NT Workstation 6.1 (Tablet Edition)' then 'Windows 7'
+		when 'Microsoft Windows NT Workstation 6.1 (Embedded)' then 'Windows 7'
+		when 'Microsoft Windows NT Workstation 10.0' then 'Windows 10'
+		when 'Microsoft Windows NT Workstation 10.0 (Tablet Edition)' then 'Windows 10'
+		else 'Unknown'
+	   end, sys.Operating_System_Name_and0, LastWUAVersion
+order by [OS],  LastWUAVersion

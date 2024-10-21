@@ -1,0 +1,45 @@
+Couldn't connect to \\10.53.1.44\ADMIN$
+No network provider accepted the given network path.
+
+Couldn't connect to \\10.106.0.241\ADMIN$
+No network provider accepted the given network path.
+
+Couldn't connect to \\10.106.9.18\ADMIN$
+No network provider accepted the given network path.
+
+Couldn't connect to \\10.106.8.244\ADMIN$
+No network provider accepted the given network path.
+
+Couldn't connect to \\10.51.14.40\ADMIN$
+No network provider accepted the given network path.
+
+Couldn't connect to \\10.51.9.251\ADMIN$
+Not enough server storage is available to process this command.
+
+Couldn't connect to \\10.51.9.221\ADMIN$
+Not enough server storage is available to process this command.
+
+^CCouldn't connect to \\10.51.9.37\ADMIN$
+No network provider accepted the given network path.
+
+Couldn't connect to \\172.28.1.105\ADMIN$
+No network provider accepted the given network path.
+
+Couldn't connect to \\10.50.37.48\ADMIN$
+No network provider accepted the given network path.
+
+Couldn't connect to \\172.21.6.252\ADMIN$
+Not enough server storage is available to process this command.
+
+Couldn't connect to \\172.24.11.12\ADMIN$
+No network provider accepted the given network path.
+
+^CCouldn't connect to \\10.53.1.44\ADMIN$
+No network provider accepted the given network path.
+
+Couldn't connect to \\10.106.8.201\ADMIN$
+No network provider accepted the given network path.
+
+Couldn't connect to \\10.106.3.40\ADMIN$
+No network provider accepted the given network path.
+

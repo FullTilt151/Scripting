@@ -1,0 +1,1 @@
+﻿(Get-ADGroupMember -Identity 'T_MEMCM_EndpointSecurityAdmins_WQ' -recursive | select -Expandproperty samaccountname) -join ", " | Out-GridView

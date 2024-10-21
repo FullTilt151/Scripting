@@ -1,0 +1,5 @@
+DEV A - Visual Studio
+DEV B - SQL Oracle
+DEV C - VS Pro
+STD - B
+STD - C

@@ -1,0 +1,175 @@
+PingPlotter Script V4.00
+ScriptType=Alert Event
+Language=VBScript
+DefaultEnabled=true
+Add a host to a summary screen.  This can be useful to assemble a list of targets that have
+fired since your last visit, or a list of currently active targets.
+---- Do not edit this line, or anything above it ----
+option explicit
+
+function GetCaption
+  GetCaption = "Add to summary screen"
+end function
+
+function GetEventEngine(NewAlertEvent)
+
+  dim NewObject
+  
+  set NewObject = new AlertEventPopupDialog
+  set GetEventEngine = NewObject
+  set NewObject.Self = NewObject
+  set NewObject.OwningEvent = NewAlertEvent
+  
+  Events.SetObjectEvent NewAlertEvent, "OnLoadSettings", NewObject, "LoadSettings"
+  Events.SetObjectEvent NewAlertEvent, "OnSignalEvent", NewObject, "SignalEvent"
+  Events.SetObjectEvent NewAlertEvent, "OnCreateEditor", NewObject, "CreateEditor"
+  Events.SetObjectEvent NewAlertEvent, "OnAlertToFields", NewObject, "AlertToFields"
+  Events.SetObjectEvent NewAlertEvent, "OnFieldsToAlert", NewObject, "FieldsToAlert"
+  Events.SetObjectEvent NewAlertEvent, "OnSaveSettings", NewObject, "SaveSettings"
+
+end function
+
+class AlertEventPopupDialog
+
+  public Self
+  public OwningEvent
+  
+  public SummaryScreen
+  public SetFocusToo
+
+  private Sub Class_Initialize( )
+
+    ' Set up the default message that will show up when a new event is created.    
+    SummaryScreen = ""
+    SetFocusToo = false
+  end sub
+
+  ' We're passed an INIFile object.  Read the values and put it in the alert event object
+  sub LoadSettings(AlertEvent, IniFile, SectionName)
+    SummaryScreen = IniFile.ReadString( SectionName, "SummaryScreen", SummaryScreen )
+    SetFocusToo = IniFile.ReadBool( SectionName, "SetFocus", SetFocusToo )
+  end sub
+
+  ' Save our settings out to the INIFile  
+  sub SaveSettings(AlertEvent, IniFile, SectionName)
+    IniFile.WriteString SectionName, "SummaryScreen", SummaryScreen
+    IniFile.WriteBool Sectionname, "SetFocus", SetFocusToo
+  end sub
+  
+  sub CreateEditor(ControlContainer)
+
+    dim Label
+    set Label = TLabel.Create(ControlContainer)
+
+    Label.Parent = ControlContainer
+    Label.Top = 5
+    Label.Caption = "Summary to add to:"
+    Label.Left = 3
+
+    dim Button
+    set Button = TButton.Create(ControlContainer)
+    Button.Parent = ControlContainer
+    Button.Name = "btnTest"
+    Button.Caption = "Test"
+    Button.Width = 60
+    Button.Anchors = SetMake(akTop, akRight)
+    Button.Left = ControlContainer.ClientWidth - Button.Width - 5
+    Button.Top = 1
+    Button.Hint = "Add to summary screen"
+    Events.SetObjectEvent Button, "OnClick", Self, "Test"
+
+    ' Create the edit control in the dialog
+    dim Combo
+    set Combo = TComboBox.Create(ControlContainer)
+
+    Combo.Parent = ControlContainer
+    Combo.Name = "comboSummaryScreen" 
+    Combo.Hint = "Pick a name, or enter new name to create one.  You can use variables (like $config) here."
+    Combo.Text = ""  
+    Combo.Top = 3
+    Combo.Left = Label.Left + Label.Canvas.TextWidth(Label.Caption) + 2
+    Combo.Anchors = SetMake(akTop, akLeft, akRight)
+    Combo.Width = ControlContainer.Width - Combo.Left - 10 - Button.Width
+
+    Combo.Clear
+    dim i
+    dim grphSummary
+
+    for i = 1 to formPingPlotterMain.SummaryGraphCount -1
+      set grphSummary = formPingPlotterMain.SummaryGraph( i )
+      if not grphSummary.IsAllTargets then
+        Combo.Items.Add grphSummary.SummaryName 
+      end if
+    next 
+
+    dim CheckBox
+    set CheckBox = TCheckBox.Create(ControlContainer)
+    CheckBox.Parent = ControlContainer    
+    CheckBox.Name = "checkShowTab"
+    CheckBox.Caption = "Set focus on summary too (probably just for testing)"
+    CheckBox.Hint = "This can get really disruptive to working on PingPlotter - it will switch to the tab and remove focus from whatever you might currently be doing with PingPlotter."
+    CheckBox.Top = Combo.BoundsRect.Bottom + 3
+    CheckBox.Left = Label.Left
+    CheckBox.Anchors = SetMake(akTop, akLeft, akRight)
+    CheckBox.Width = ControlContainer.Width - CheckBox.Left
+
+    ' If we don't set the Container height, PingPlotter will do it for us.  For this
+    ' example, we'll set it ourself, though.
+    ControlContainer.Height = CheckBox.BoundsRect.Bottom + 3
+    ControlContainer.Parent.Height = ControlContainer.Height + ControlContainer.Top    
+
+  end sub
+
+  ' Copy the alert event values into the edit fields
+  sub AlertToFields(ControlContainer)
+    ControlContainer.comboSummaryScreen.Text = SummaryScreen
+    ControlContainer.checkShowTab.Checked = SetFocusToo
+  end sub
+
+  ' Copy the edit field values to the alert event
+  sub FieldsToAlert(ControlContainer)
+    if IsObject(ControlContainer.comboSummaryScreen) then
+      SummaryScreen = ControlContainer.comboSummaryScreen.Text
+      SetFocusToo = ControlContainer.checkShowTab.Checked
+    end if
+  end sub
+
+  sub Test(Sender)
+    FieldsToAlert(Sender.Parent) ' Sender is the button - the container is the parent
+    SignalEvent(OwningEvent)
+  end sub  
+
+  sub SignalEvent(AlertEvent)
+    dim i
+    dim grphSummary
+    dim screenFound
+    dim thisScreenName
+
+    screenFound = false
+    thisScreenName = SubstiteHostInfoMask(SummaryScreen, AlertEvent.MonitoredHost, TRUE)
+
+    for i = 1 to formPingPlotterMain.SummaryGraphCount -1
+      set grphSummary = formPingPlotterMain.SummaryGraph( i )
+      if StrComp(grphSummary.SummaryName, thisScreenName, vbTextCompare) = 0 then
+        screenFound = true
+        if (not (AlertEvent.MonitoredHost is nothing)) then ' For testing, this could be empty object
+          grphSummary.AddTarget( AlertEvent.Alert.MonitoredHost )
+        end if
+      end if
+    next   
+
+    if (not screenFound) then
+      set grphSummary = formPingPlotterMain.CreateNewSummaryGraph
+      grphSummary.SummaryName = thisScreenName
+      if (not (AlertEvent.MonitoredHost is nothing)) then ' For testing, this could be empty object
+        grphSummary.AddTarget( AlertEvent.Alert.MonitoredHost )
+      end if  
+    end if
+
+    if SetFocusToo then    
+      grphSummary.Parent.Show  
+    end if    
+
+  end sub
+
+end class

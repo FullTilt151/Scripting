@@ -1,0 +1,1 @@
+﻿MsiExec.exe /x {7E3F3F40-2012-40E0-9245-E5CAA64B8097} /qn /norestart /l* C:\temp\SDUninstalllog.txt

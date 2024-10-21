@@ -1,0 +1,2 @@
+﻿Add-PSSnapin citrix.*
+$b= (Get-Brokermachine -AdminAddress LOUXDCWPGX1S003.TS.HUMAD.COM -MaxRecordCount 10000 |Where-Object{($_.registrationstate -ne "registered") -and ($_.allocationtype -eq "static") -and ($_.hostedmachinename -notlike "*aet*") -and ($_.Associateduserfullnames -ne "") })|Select-Object -Property HostedMachinename,AssociatedUserNames,LastConnectionTime , LastConnectionUser , RegistrationState , InMaintenanceMode , PowerState|Export-Csv c:\temp\unreg.csv -Force 

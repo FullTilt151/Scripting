@@ -1,0 +1,2 @@
+﻿Connect-AzureAD -TenantId 56c62bbe-8598-4b85-9e51-1ca753fa50f2
+(Get-AzureADDevice -all $true).where({$_.DeviceOSType -eq 'Windows'}) | Select-Object DisplayName,DeviceTrustType,DeviceOSType,AccountEnabled | Group-Object DeviceTrustType | Select-Object Count, Name

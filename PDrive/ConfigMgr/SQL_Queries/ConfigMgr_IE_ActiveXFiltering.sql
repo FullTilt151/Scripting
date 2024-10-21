@@ -1,0 +1,2 @@
+select ResourceID, User0, FilteringEnabled0, ScriptLastRan0
+from v_GS_IE_ACTIVE_X_FILTERING

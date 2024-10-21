@@ -1,0 +1,1 @@
+wmic useraccount where "name='guest' and localaccount = 'true'" rename humguest

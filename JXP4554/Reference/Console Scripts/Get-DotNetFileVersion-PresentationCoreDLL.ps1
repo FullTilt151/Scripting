@@ -1,0 +1,1 @@
+(Get-ItemProperty 'C:\Program Files\Reference Assemblies\Microsoft\Framework\v3.0\PresentationCore.dll' | Select-Object -ExpandProperty VersionInfo).FileVersion

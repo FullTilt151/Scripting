@@ -1,0 +1,142 @@
+PingPlotter Script V4.00
+ScriptType=Alert Event
+Language=VBScript
+DefaultEnabled=true
+Add a host to a summary screen.  This can be useful to assemble a list of targets that have
+fired since your last visit, or a list of currently active targets.
+---- Do not edit this line, or anything above it ----
+option explicit
+
+function GetCaption
+  GetCaption = "Remove from summary screen"
+end function
+
+function GetEventEngine(NewAlertEvent)
+
+  dim NewObject
+  
+  set NewObject = new AlertEventPopupDialog
+  set GetEventEngine = NewObject
+  set NewObject.Self = NewObject
+  set NewObject.OwningEvent = NewAlertEvent
+  
+  Events.SetObjectEvent NewAlertEvent, "OnLoadSettings", NewObject, "LoadSettings"
+  Events.SetObjectEvent NewAlertEvent, "OnSignalEvent", NewObject, "SignalEvent"
+  Events.SetObjectEvent NewAlertEvent, "OnCreateEditor", NewObject, "CreateEditor"
+  Events.SetObjectEvent NewAlertEvent, "OnAlertToFields", NewObject, "AlertToFields"
+  Events.SetObjectEvent NewAlertEvent, "OnFieldsToAlert", NewObject, "FieldsToAlert"
+  Events.SetObjectEvent NewAlertEvent, "OnSaveSettings", NewObject, "SaveSettings"
+
+end function
+
+class AlertEventPopupDialog
+
+  public Self
+  public OwningEvent
+  
+  public SummaryScreen
+
+  private Sub Class_Initialize( )
+
+    ' Set up the default message that will show up when a new event is created.    
+    SummaryScreen = ""
+  end sub
+
+  ' We're passed an INIFile object.  Read the values and put it in the alert event object
+  sub LoadSettings(AlertEvent, IniFile, SectionName)
+    SummaryScreen = IniFile.ReadString( SectionName, "SummaryScreen", SummaryScreen )
+  end sub
+
+  ' Save our settings out to the INIFile  
+  sub SaveSettings(AlertEvent, IniFile, SectionName)
+    IniFile.WriteString SectionName, "SummaryScreen", SummaryScreen
+  end sub
+  
+  sub CreateEditor(ControlContainer)
+
+    dim Label
+    set Label = TLabel.Create(ControlContainer)
+
+    Label.Parent = ControlContainer
+    Label.Top = 5
+    Label.Caption = "Summary to remove from:"
+    Label.Left = 3
+
+    dim Button
+    set Button = TButton.Create(ControlContainer)
+    Button.Parent = ControlContainer
+    Button.Name = "btnTest"
+    Button.Caption = "Test"
+    Button.Width = 60
+    Button.Anchors = SetMake(akTop, akRight)
+    Button.Left = ControlContainer.ClientWidth - Button.Width - 5
+    Button.Top = 1
+    Button.Hint = "Remove from sumamry screen"
+    Events.SetObjectEvent Button, "OnClick", Self, "Test"
+
+    ' Create the edit control in the dialog
+    dim Combo
+    set Combo = TComboBox.Create(ControlContainer)
+
+    Combo.Parent = ControlContainer
+    Combo.Name = "comboSummaryScreen" 
+    Combo.Hint = "Pick a name, or enter new name to create one.  You can use variables (like $config) here."
+    Combo.Text = ""  
+    Combo.Top = 3
+    Combo.Left = Label.Left + Label.Canvas.TextWidth(Label.Caption) + 2
+    Combo.Anchors = SetMake(akTop, akLeft, akRight)
+    Combo.Width = ControlContainer.Width - Combo.Left - 10 - Button.Width
+
+    Combo.Clear
+    dim i
+    dim grphSummary
+
+    for i = 1 to formPingPlotterMain.SummaryGraphCount -1
+      set grphSummary = formPingPlotterMain.SummaryGraph( i )
+      if not grphSummary.IsAllTargets then
+        Combo.Items.Add grphSummary.SummaryName 
+      end if
+    next 
+
+    ' If we don't set the Container height, PingPlotter will do it for us.  For this
+    ' example, we'll set it ourself, though.
+    ControlContainer.Height = Combo.BoundsRect.Bottom + 3
+    ControlContainer.Parent.Height = ControlContainer.Height + ControlContainer.Top    
+
+  end sub
+
+  ' Copy the alert event values into the edit fields
+  sub AlertToFields(ControlContainer)
+    ControlContainer.comboSummaryScreen.Text = SummaryScreen
+  end sub
+
+  ' Copy the edit field values to the alert event
+  sub FieldsToAlert(ControlContainer)
+    if IsObject(ControlContainer.comboSummaryScreen) then
+      SummaryScreen = ControlContainer.comboSummaryScreen.Text
+    end if
+  end sub
+
+  sub Test(Sender)
+    FieldsToAlert(Sender.Parent) ' Sender is the button - the container is the parent
+    SignalEvent(OwningEvent)
+  end sub  
+
+  sub SignalEvent(AlertEvent)
+    dim i
+    dim grphSummary
+    dim thisScreenName
+
+    thisScreenName = SubstiteHostInfoMask(SummaryScreen, AlertEvent.MonitoredHost, TRUE)
+
+    for i = 1 to formPingPlotterMain.SummaryGraphCount -1
+      set grphSummary = formPingPlotterMain.SummaryGraph( i )
+      if StrComp(grphSummary.SummaryName, thisScreenName, vbTextCompare) = 0 then
+        if (not (AlertEvent.MonitoredHost is nothing)) then ' For testing, this could be empty object
+          grphSummary.RemoveTarget( AlertEvent.Alert.MonitoredHost )
+        end if
+      end if
+    next   
+  end sub
+
+end class

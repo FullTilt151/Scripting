@@ -1,0 +1,1 @@
+﻿& "C:\Program Files\Citrix\XenDesktopVdaSetup\XenDesktopVdaSetup.exe" /removeall /quiet /noreboot /logpath c:\temp\XenDesktop7.1Uninstall

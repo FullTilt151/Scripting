@@ -1,0 +1,1 @@
+Start CMTrace "C:\Program Files\Update Services\LogFiles\SoftwareDistribution.log" "C:\Temp\Optimize-WSUSIndex.log" "C:\Temp\Optimize-WSUS.log" "C:\Temp\Invoke-CMNSoftwareUpdateMaintenance.log"

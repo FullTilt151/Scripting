@@ -1,0 +1,1 @@
+& "C:\Program Files (x86)\Intel\Intel(R) SSD Toolbox\Uninstall\setup.exe" -uninstall -s

@@ -1,0 +1,1 @@
+xcopy "%~dp0cmtrace.exe" c:\windows\system32 /x /c /y

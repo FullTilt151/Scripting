@@ -1,0 +1,1 @@
+Get-ChildItem 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Domains'

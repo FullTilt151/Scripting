@@ -1,0 +1,143 @@
+PingPlotter Script V4.00
+ScriptType=Startup
+Language=VBScript
+This script shows a column for "Jitter" on the upper graph.  The actual calculation for
+jitter is done inside PingPlotter itself for speed, but if any "tweaks" to the formula
+need to be done, you can override this (or create your own version of this).  The jitter
+numbers show up as red if they are over 15% of the average latency.
+---- Do not edit this line, or anything above it ----
+option explicit
+
+Events.SetEvent MainForm, "OnNewSummaryGraph", "CreateNewTarget"
+Events.SetEvent MainForm, "OnNewTargetView", "CreateNewTarget"
+
+' This is called each time we create a new grid / form.  This should do whatever
+' modifications are needed on this form.
+sub CreateNewTarget(Sender, NewTarget)
+  Dim Column
+  set Column = New Jitter
+
+  set Column.Self = Column
+  set Column.GridForm = NewTarget
+  Column.CreateColumn
+end sub
+
+' The "StdDeviation" class will create a new column in PingPlotter, and then
+' calculates and paints it.
+class Jitter
+
+  public MyNewColumn
+  private DataFieldIndex
+
+  public GridForm
+  public Self
+
+  public Sub CreateColumn
+
+    set MyNewColumn = GridForm.drgrTrace.AddColumn(ctUser, "The jitter for the selected set.","Jttr",0, TRUE, 38)
+    DataFieldIndex = MyNewColumn.GetUniqueUserIDValue
+    MyNewColumn.SetupData("DataColumnIndex") = DataFieldIndex
+
+    Events.SetObjectEvent Self.MyNewColumn, "OnCalcUserValue", Self, "CalcUserValue"
+    Events.SetObjectEvent Self.MyNewColumn, "OnDrawCell", Self, "MyDrawCell"
+
+  end sub
+
+  private Sub Class_Terminate( )
+
+  End Sub
+
+  '-----------------------------------------------------------
+  ' CalcUserValue
+  '-----------------------------------------------------------
+  ' This is called whenever a data value has changed
+  ' and the previously calced value is no longer valid
+  '-----------------------------------------------------------
+  public sub CalcUserValue(Sender, HostStats,  Index, byref Value)
+
+    ' By default, use internal jitter calculation
+    if (HostStats.GoodCount > 0) then
+      Value = FormatNumber(HostStats.Jitter, 2)
+    else
+      Value = null
+    end if
+
+    Exit Sub
+    ' The following calculationg mimics what is done in PingPlotter - but
+    ' native code is about 10 times faster
+
+    dim X, Samples, CurSamp, IntHost, Jitter, PrevSamp
+    dim BeginSamp, EndSamp, GoodCount
+
+    Jitter = 0.00
+    PrevSamp = -1
+
+    IntHost = HostStats.HostInfo
+
+    BeginSamp = HostStats.FirstSample
+    EndSamp = HostStats.LastSample
+
+    GoodCount = 0
+
+    for X = BeginSamp to EndSamp
+      CurSamp = IntHost.Items(X)
+      if (CurSamp >= 0) and (CurSamp < 32768) then
+        if (PrevSamp >= 0) then
+ 	        Jitter = Jitter + abs(PrevSamp - CurSamp)
+        end if
+        PrevSamp = CurSamp
+        GoodCount = GoodCount + 1
+	  end if
+    next
+
+    if (GoodCount > 1) then
+      Value = FormatNumber(Jitter / (GoodCount-1), 2)
+    else
+      Value = null
+    end if
+  end sub
+
+  '-----------------------------------------------------------
+  ' MyDrawCell
+  '-----------------------------------------------------------
+  ' This is called whenever the column needs to be painted.
+  ' This could happen relatively often, so it should probably
+  ' be pretty light-weight.
+  '-----------------------------------------------------------
+  public sub MyDrawCell(Canvas, HostStats, ByRef Rect, CurColDef, Col, Row, ByRef Handled)
+
+    if IsObject(HostStats) and not (HostStats is Nothing) then
+      dim DataFieldValue, DisplayValue
+
+      ' If calculating Jitter in this script, use this line:
+      '      DataFieldValue = HostStats.UserValue(DataFieldIndex)
+      ' otherwise, use the following to access the internal PingPlotter
+      ' Jitter calculation.
+
+      DataFieldValue = HostStats.UserValue(DataFieldIndex)
+
+      if IsNumeric(DataFieldValue) then
+        DisplayValue = FormatNumber(DataFieldValue, 2)
+
+        ' Let's say anything where Jitter is > 15% of the average is
+        ' should show red instead of black
+        if (HostStats.Avg > 1) then
+          if ((DataFieldValue / HostStats.Avg) > 0.15) then
+            Canvas.Font.Color = clRed
+          end if
+        end if
+
+      else
+        DisplayValue = ""
+      end if
+
+      dim TWidth
+      TWidth = Canvas.TextWidth(DisplayValue)
+
+      Canvas.TextRect Rect, Rect.Right - TWidth - 3, Rect.Top+2, DisplayValue
+
+      Handled = true
+    end if
+  end sub
+
+end class

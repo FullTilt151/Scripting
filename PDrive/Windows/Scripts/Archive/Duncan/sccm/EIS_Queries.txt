@@ -1,0 +1,151 @@
+/*
+Code	Short_Name
+LCD	Last Communication Date (Last time host was seen)
+HOS	Host Operation System
+DVSN	Device Serial number
+HST	Workstation Name
+ADC	AD Domain Membership
+MOD	Model of Host
+CHT	Chassis Type
+VNDR	Vendor Name of Host
+LLU	Last Logon User
+
+*/
+
+select distinct
+CAST(SMS_R_System.ItemKey AS varchar(10)) as ItemKey,
+SMS_R_System.Name0 AS HST,
+SMS_G_System_PC_BIOS.SerialNumber00 as DVSN,
+CHT = 
+CASE SMS_G_System_SYSTEM_ENCLOSURE.ChassisTypes00
+ when 1 then 'Other'
+ when 2 then 'Unknown'
+ when 3 then 'Desktop'
+ when 4 then 'Low Profile Desktop'
+ when 5 then 'Pizza Box'
+ when 6 then 'Mini Tower'
+ when 7 then 'Tower'
+ when 8 then 'Portable'
+ when 9 then 'Laptop'
+ when 10 then 'Notebook'
+ when 11 then 'Hand Held'
+ when 12 then 'Docking Station'
+ when 13 then 'All in One'
+ when 14 then 'Sub Notebook'
+ when 15 then 'Space-Saving'
+ when 16 then 'Lunch Box'
+ when 17 then 'Main System Chassis'
+ when 18 then 'Expansion Chassis'
+ when 19 then 'SubChassis'
+ when 20 then 'Bus Expansion Chassis'
+ when 21 then 'Peripheral Chassis'
+ when 22 then 'Storage Chassis'
+ when 23 then 'Rack Mount Chassis'
+ when 24 then 'Sealed-Case PC'
+ else 'Unknown'
+END,
+SMS_R_System.User_Domain0 +  '\'  +  SMS_R_System.User_Name0 'LLU',
+SMS_R_System.Operating_System_Name_and0 AS HOS,
+SMS_R_System.Resource_Domain_OR_Workgr0 AS ADC,
+SMS_G_System_COMPUTER_SYSTEM.Manufacturer00 AS VNDR,
+SMS_G_System_COMPUTER_SYSTEM.Model0 AS MOD,
+Convert(VarChar(20), AD.AgentTime, 120) AS LCD
+from System_DISC AS SMS_R_System
+LEFT OUTER JOIN Computer_System_DATA AS SMS_G_System_COMPUTER_SYSTEM
+ON SMS_G_System_COMPUTER_SYSTEM.MachineID = SMS_R_System.ItemKey
+LEFT OUTER JOIN System_Enclosure_DATA AS SMS_G_System_SYSTEM_ENCLOSURE
+ON SMS_G_System_SYSTEM_ENCLOSURE.MachineID = SMS_R_System.ItemKey
+LEFT OUTER JOIN PC_BIOS_DATA AS SMS_G_System_PC_BIOS
+ON SMS_G_System_PC_BIOS.MachineID = SMS_R_System.ItemKey
+LEFT OUTER JOIN v_AgentDiscoveries AD
+ON AD.ResourceId = SMS_R_System.ItemKey
+LEFT OUTER JOIN v_AgentDiscoveries CurrentSite
+ON CurrentSite.ResourceId = SMS_R_System.ItemKey
+where SMS_R_System.Obsolete0 = 0
+AND SMS_G_System_SYSTEM_ENCLOSURE.ChassisTypes00 <> '12'
+AND SMS_R_System.Client0 = 1
+AND AD.AgentName ='Heartbeat Discovery'
+AND CurrentSite.AgentName = 'MP_ClientRegistration'
+AND AD.AgentSite = CurrentSite.AgentSite
+order by SMS_R_System.Name0
+
+/*
+Code	Short_Name
+HST	Workstation Name
+PHDSN	Primary Hard disk Serial Number
+
+*/
+
+select distinct
+SMS_R_System.ItemKey,
+SMS_R_System.Name0 AS HST,
+___CUSTOM_PHYSICAL_MEDIA_1_00.SerialNumber00 AS PHDSN
+from System_DISC AS SMS_R_System
+INNER JOIN Physical_Media_DATA AS ___CUSTOM_PHYSICAL_MEDIA_1_00
+ON ___CUSTOM_PHYSICAL_MEDIA_1_00.MachineID = SMS_R_System.ItemKey
+where SMS_R_System.Obsolete0 = 0
+AND SMS_R_System.Client0 = 1
+AND ___CUSTOM_PHYSICAL_MEDIA_1_00.SerialNumber00 is not null
+AND ___CUSTOM_PHYSICAL_MEDIA_1_00.Tag00 like '\\.\PHYSICALDRIVE%'
+order by SMS_R_System.Name0
+
+/*
+Code	Short_Name
+HST	Workstation Name
+MAC	MAC Address
+
+*/
+
+select distinct
+SMS_R_System.ItemKey,
+SMS_R_System.Name0 AS HST,
+SMS_G_System_NETWORK_ADAPTER.MACAddress0 as MAC
+from System_DISC AS SMS_R_System
+LEFT OUTER JOIN Netcard_DATA AS SMS_G_System_NETWORK_ADAPTER
+ON SMS_G_System_NETWORK_ADAPTER.MachineID = SMS_R_System.ItemKey
+where SMS_R_System.Obsolete0 = 0
+AND SMS_R_System.Client0 = 1
+AND SMS_G_System_NETWORK_ADAPTER.AdapterType0 like 'Ethernet%'
+AND SMS_G_System_NETWORK_ADAPTER.ProductName0 <> '1394 Net Adapter'
+AND SMS_G_System_NETWORK_ADAPTER.ProductName0 not like '%Miniport'
+order by SMS_R_System.Name0
+
+/*
+Code	Short_Name
+HST	Workstation Name
+NIP	Network IP
+SNM	Subnet Mask
+
+*/
+
+Select Distinct 
+Sms_R_System.Itemkey,
+Sms_R_System.Name0 As Hst,
+__Work_Adapter_Configuration0.Ipaddress0 As Nip,
+__Work_Adapter_Configuration0.Ipsubnet0 As Snm
+From System_Disc As Sms_R_System
+Left Outer Join Network_Data As __Work_Adapter_Configuration0
+On __Work_Adapter_Configuration0.Machineid = Sms_R_System.Itemkey 
+Where Sms_R_System.Obsolete0 = 0
+And Sms_R_System.Client0 = 1
+And __Work_Adapter_Configuration0.Ipenabled00 = 1
+Order By Sms_R_System.Name0
+
+/*
+Code	Short_Name
+HST	Workstation Name
+FQD	Fully Qualified Domain
+
+*/
+
+select distinct
+SMS_R_System.ItemKey,
+SMS_R_System.Name0 AS HST,
+System_Resource_N_ARR.Resource_Names0 as FQD
+from System_DISC AS SMS_R_System
+LEFT OUTER JOIN System_Resource_N_ARR
+ON System_Resource_N_ARR.ItemKey = SMS_R_System.ItemKey
+where SMS_R_System.Obsolete0 = 0
+AND SMS_R_System.Client0 = 1
+AND System_Resource_N_ARR.Resource_Names0 like '%.%'
+order by SMS_R_System.Name0

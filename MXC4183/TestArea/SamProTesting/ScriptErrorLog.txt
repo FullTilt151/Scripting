@@ -1,0 +1,31 @@
+DebugFlow Designer: Operation(Discover And Store SCCM Data.If$1.5dfb2975db91a050678b25b2ca96194f.If$1.9dfb2975db91a050678b25b2ca961955.fdfb6975db91a050678b25b2ca9619c4./end) = COMPLETE
+
+DebugFlow Designer: Operation(Discover And Store SCCM Data.If$1.5dfb2975db91a050678b25b2ca96194f.If$1.9dfb2975db91a050678b25b2ca961955.fdfb6975db91a050678b25b2ca9619c4.982dd217dbc39010318651d7f49619f1) = COMPLETE
+
+WarningScopedRhinoObjectWrapper: not a wrappable type: com.snc.process_flow.engine.FlowScriptAPI
+
+Information2020-12-28 16:11:11 Tried Credential: name=SCCM Credential, affinity: yes, status=success, sysid=e7890cfadb15e4504cddc25a139619b4, username=HUMAD\snow_sampro, type=Windows, order=100 
+
+InformationDEBUG: Successfully executed ActionGetDeviceCollections.ps1
+
+InformationDEBUG: Execution status: success
+
+InformationDEBUG: The exit value from waitFor() is 0
+
+InformationDEBUG: Thread name is Powershell is executing...
+
+InformationDEBUG: With credential named : SCCM Credential
+
+InformationDEBUG: Executing command: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -executionpolicy unrestricted -noninteractive -nologo -noprofile -command "& {& 'scripts\PowerShell\PSScript.ps1' -computer 'louappwqs1151.rsc.humad.com' -script 'D:\HumDev2\agent\scripts\PowerShell\SCCMSpoke\ActionGetDeviceCollections.ps1' -useCred $true -ismid $false -isDiscovery $true -debug $true -logInfo $f...
+
+Warningvariable 'properties' value is null or empty
+
+DebugFlow Designer: Operation(Discover And Store SCCM Data.If$1.5dfb2975db91a050678b25b2ca96194f.If$1.9dfb2975db91a050678b25b2ca961955.fdfb6975db91a050678b25b2ca9619c4.CR_Step_542dd217dbc39010318651d7f49619e6) = COMPLETE
+
+WarningInvalid value received (ALL) for application
+
+DebugFlow Designer: Operation(Discover And Store SCCM Data.If$1.5dfb2975db91a050678b25b2ca96194f.If$1.9dfb2975db91a050678b25b2ca961955.fdfb6975db91a050678b25b2ca9619c4.d82dd217dbc39010318651d7f49619d0) = COMPLETE
+
+WarningScopedRhinoObjectWrapper: not a wrappable type: com.snc.process_flow.engine.FlowScriptAPI
+
+DebugFlow Designer: Operation(Discover And Store SCCM Data.If$1.5dfb2975db91a050678b25b2ca96194f.If$1.9dfb2975db91a050678b25b2ca961955.fdfb6975db91a050678b25b2ca9619c4./start) = COMPLETE

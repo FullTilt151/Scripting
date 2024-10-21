@@ -1,0 +1,13 @@
+--Get referenced packages from PXE Lite Pre-cache TS
+SELECT Pkg.PackageID, Ref.ReferenceName, Pkg.SourceVersion
+FROM v_TaskSequenceReferencesInfo Ref
+inner join
+v_Package Pkg
+on Ref.ReferencePackageID = Pkg.PackageID
+WHERE ref.PackageID = 'hum000d8'
+--and Stat.PackageID = 'hum000d3'
+order by Pkg.PackageID
+
+--Get all boot image packages
+select * from SMSPackages
+where PackageType = 258

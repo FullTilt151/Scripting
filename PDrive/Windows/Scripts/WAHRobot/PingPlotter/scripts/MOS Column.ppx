@@ -1,0 +1,139 @@
+PingPlotter Script V4.00
+ScriptType=Startup
+Language=VBScript
+DefaultEnabled=0
+This script calculates the Mean Opinion Score from an estimated "R" value.
+
+Note: This script is a prototype and the calculations should not be relied on to match other methods
+of calculating this metric.
+---- Do not edit this line, or anything above it ----
+option explicit
+
+Events.SetEvent MainForm, "OnNewSummaryGraph", "CreateNewTarget"
+Events.SetEvent MainForm, "OnNewTargetView", "CreateNewTarget"
+
+' This is called each time we create a new grid / form.  This should do whatever
+' modifications are needed on this form.
+sub CreateNewTarget(Sender, NewTarget)
+  Dim Column
+  set Column = New MOSColumn
+
+  set Column.Self = Column
+  set Column.GridForm = NewTarget
+  Column.CreateColumn
+end sub
+
+' sub NewTraceForm_OnResize(Sender)
+'   writeline("Resized!")
+' end sub
+
+
+' The "StdDeviation" class will create a new column in PingPlotter, and then
+' calculates and paints it.
+class MOSColumn
+
+  public MyNewColumn
+  private DataFieldIndex
+
+  public GridForm
+  public Self
+
+  public Sub CreateColumn
+
+    set MyNewColumn = GridForm.drgrTrace.AddColumn(ctUser, "The MOS (Mean Opinion Score) for the selected set." & vbCRLF & "Warning: This is a prototype calculation!","MOS*",0, TRUE, 35)
+    DataFieldIndex = MyNewColumn.GetUniqueUserIDValue
+    MyNewColumn.SetupData("DataColumnIndex") = DataFieldIndex
+
+    Events.SetObjectEvent Self.MyNewColumn, "OnCalcUserValue", Self, "CalcUserValue"
+    Events.SetObjectEvent Self.MyNewColumn, "OnDrawCell", Self, "MyDrawCell"
+
+  end sub
+
+  private Sub Class_Terminate( )
+
+  End Sub
+
+  '-----------------------------------------------------------
+  ' CalcUserValue
+  '-----------------------------------------------------------
+  ' This is called whenever a data value has changed
+  ' and the previously calced value is no longer valid
+  '-----------------------------------------------------------
+  public sub CalcUserValue(Sender, HostStats,  Index, Value)
+  
+    ' OK, we have Jitter (in ms), Latency (in ms) and packet loss (in percent).
+    ' Determine the MOS based on these numbers
+    ' ***** NOTE ***** THIS IS SIMULATED FORMULA ONLY!  DO NOT RELY ON THIS!!!
+    dim R
+    dim MOSCalc
+    dim EffLat ' Effective Latency
+
+    ' Take the average latency, add jitter, but double the impact to latency
+    ' then add 10 for protocol latencies
+    EffLat = ( HostStats.Avg + HostStats.Jitter * 2 + 10 )
+
+    ' Implement a basic curve - deduct 4 for the R value at 160ms of latency (round trip)
+    ' Anything over that gets a much more agressive deduction
+    
+    if EffLat < 160 then
+      R = 93.2 - (EffLat / 40)
+    else
+      R = 93.2 - (EffLat - 120) / 10
+    end if
+
+    ' Now, let's drag in our packet loss (note that this is just a made up
+    ' impact point.  We need to review this formula)
+    R = R - (HostStats.PacketLoss * 2.5)
+
+    ' Make sure we don't have a negative
+    if (R < 0) then
+      R = 0
+    end if
+
+    ' Convert the R into an MOS value.
+    Value = FormatNumber(1 + (0.035) * R + (.000007) * R * (R-60) * (100-R), 2)
+
+  end sub
+
+  '-----------------------------------------------------------
+  ' MyDrawCell
+  '-----------------------------------------------------------
+  ' This is called whenever the column needs to be painted.
+  ' This could happen relatively often, so it should probably
+  ' be pretty light-weight.
+  '-----------------------------------------------------------
+  public sub MyDrawCell(Canvas, HostStats, ByRef Rect, CurColDef, Col, Row, ByRef Handled)
+
+    ' If we're drawing the header, then HostStats will be undefined.
+    if IsObject(HostStats) and not (HostStats is Nothing) then
+    
+      dim DataFieldValue, DisplayValue
+
+      DataFieldValue = HostStats.UserValue(DataFieldIndex)
+	    
+	    dim TWidth
+
+      if IsNumeric(DataFieldValue) then
+
+        ' Want to display MOS with 2 digits of accuracy.
+        DisplayValue = FormatNumber(DataFieldValue, 2)
+
+        ' Let's say anything where MOS is < 2.5
+        ' should show red instead of black
+        if (DataFieldValue < 2.5) then
+          Canvas.Font.Color = clRed
+        end if
+
+  	    TWidth = Canvas.TextWidth(DisplayValue)
+      else
+        TWidth = 0
+        DisplayValue = ""
+      end if
+
+      Canvas.TextRect Rect, Rect.Right - TWidth - 3, Rect.Top+2, DisplayValue
+
+      Handled = true
+    end if
+  end sub
+
+end class

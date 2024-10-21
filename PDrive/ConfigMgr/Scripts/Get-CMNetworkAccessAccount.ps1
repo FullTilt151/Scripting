@@ -1,0 +1,1 @@
+﻿Get-Wmiobject -namespace 'root\ccm\policy\Machine\ActualConfig' -class 'CCM_NetworkAccessAccount'

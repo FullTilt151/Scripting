@@ -1,0 +1,1 @@
+Start CMTrace "C:\Temp\CSIA.log" "C:\Windows\CCM\Logs\WUAHandler.log" "C:\Windows\CCM\Logs\UpdatesDeployment.log" "C:\Windows\CCM\Logs\ScanAgent.log" "C:\Windows\CCM\Logs\InventoryAgent.log" "C:\Windows\CCM\Logs\CAS.log" "C:\Windows\CCM\Logs\PolicyAgent.log" "C:\Windows\CCM\Logs\CcmExec.log"

@@ -1,0 +1,32 @@
+
+Set Buffer Size for new Delivery Groups
+Get-BrokerDektopGroup "Delivery Group Name" 
+Set-BrokerDesktopGroup "Delivery Group Name"  -PeakBufferSizePercent 100
+Set-BrokerDesktopGroup "Delivery Group Name"  -OffPeakBufferSizePercent 100 
+
+
+
+
+Add VMWare Snapin
+if ((Get-PSSnapin | where { $_.Name -like "VMWare*"}) -eq $null)
+{
+	Add-PSSnapin VMware.VimAutomation.Core
+}
+
+
+VM Counts per segment 
+Connect-VIServer louvcswps05.rsc.humad.com
+$networks = get-view -viewtype Network | where {$_.name -like "*DC_Xen_*"}
+foreach ($net in $networks) {write-host "Name "$net.name "  Number of VMs " $net.vm.count}
+
+
+
+VM Count in a Catalog
+Asnp Citrix*
+$controller="louxddwps01.ts.humad.com"
+$TSS_A_Cat = Get-BrokerCatalog -AdminAddress $controller -Filter { Name -eq 'Windows7_TSS_A' }
+$TSS_A_Cat.UsedCount
+
+AD Group Members
+Import-module ActiveDirectory
+Get-ADGroupMember -identity “G_TS_XD_HUM_TRN_A” -recursive | select name, SamAccountName | Export-csv -path C:\temp\G_TS_XD_HUM_TRN_A.csv -NoTypeInformation

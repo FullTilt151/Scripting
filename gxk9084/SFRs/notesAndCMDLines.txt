@@ -1,0 +1,34 @@
+if someone creates a deployment in **SP1 and selects to ignore maintenence window, and is targeted to more than x number of servers.. create status filtering rule to alert..
+
+QA, Prod
+Threshhold? (Number of servers in a deployment) skip email alert and send text
+filter on collection ID
+does the targeted colleiton have any prod or qa servers? How may? is there more than the threshhold? send alert..
+
+
+Look online for SFR's
+
+ETA in problem ticket (eg, by Nov 1, Dec 1..... )
+
+SP1
+Advertisement flags for a deployment? Look into flags
+SCCM SDK...  in MSDN
+WMI class sms_advertisement
+Hex bit, maybe use that to check for the checkbox
+OVERRIDE_SERVICE_WINDOWS*************   This is the one to look for
+
+Get-WMIObject -computername louappwps... -namespace root\sms\site_wp1 -class sms_advertisement | select-object -first 10
+AdvertFlags
+
+
+
+
+
+
+
+
+
+
+Move ccmcache project
+All Windows TEST Servers Limiting Collection in SP1
+select-object advertisementname, advertflags

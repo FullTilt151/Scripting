@@ -1,0 +1,1106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RDCMan programVersion="2.7" schemaVersion="3">
+  <file>
+    <credentialsProfiles>
+      <credentialsProfile inherit="None">
+        <profileName scope="Local">LOUTMS\JXP4554A</profileName>
+        <userName>JXP4554A</userName>
+        <password />
+        <domain>LOUTMS</domain>
+      </credentialsProfile>
+    </credentialsProfiles>
+    <properties>
+      <expanded>True</expanded>
+      <name>Jim's Remote Desktops</name>
+    </properties>
+    <encryptionSettings inherit="None">
+      <encryptionMethod>LogonCredentials</encryptionMethod>
+      <credentialName>HUMAD\JXP4554</credentialName>
+      <credentialData />
+    </encryptionSettings>
+    <group>
+      <properties>
+        <expanded>False</expanded>
+        <name>1E</name>
+      </properties>
+      <group>
+        <properties>
+          <expanded>False</expanded>
+          <name>CAS</name>
+        </properties>
+        <server>
+          <properties>
+            <displayName>LOUAPPWPS622 - 1E Services</displayName>
+            <name>LOUAPPWPS622</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUSQLWPS360 AppClarity</displayName>
+            <name>LOUSQLWPS360</name>
+          </properties>
+        </server>
+      </group>
+      <group>
+        <properties>
+          <expanded>False</expanded>
+          <name>MT1</name>
+        </properties>
+        <server>
+          <properties>
+            <name>LOUAPPWTS1047</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <name>LOUAPPWTS1048</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWTS1329 - AC</displayName>
+            <name>LOUAPPWTS1329</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <name>LOUSQLWTS545</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <name>LOUSQLWTS546</name>
+          </properties>
+        </server>
+      </group>
+      <group>
+        <properties>
+          <expanded>False</expanded>
+          <name>Tachyon</name>
+        </properties>
+        <server>
+          <properties>
+            <name>LOUAPPWQS1520.dmzad.hum</name>
+          </properties>
+        </server>
+      </group>
+      <group>
+        <properties>
+          <expanded>False</expanded>
+          <name>WP1</name>
+        </properties>
+        <server>
+          <properties>
+            <name>LOUAPPWPS1632</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWPS1662 Shopping Server</displayName>
+            <name>LOUAPPWPS1662</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWPS2086 - AC</displayName>
+            <name>LOUAPPWPS2086</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <name>LOUSQLWPS601</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <name>LOUSQLWPS602</name>
+          </properties>
+        </server>
+      </group>
+      <group>
+        <properties>
+          <expanded>False</expanded>
+          <name>WQ1</name>
+        </properties>
+        <server>
+          <properties>
+            <name>LOUAPPWQS1043</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <name>LOUAPPWQS1044</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWQS1303 - AC</displayName>
+            <name>LOUAPPWQS1303</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <name>LOUSQLWQS513</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <name>LOUSQLWQS514</name>
+          </properties>
+        </server>
+      </group>
+    </group>
+    <group>
+      <properties>
+        <expanded>False</expanded>
+        <name>Client Issues</name>
+      </properties>
+      <server>
+        <properties>
+          <name>AWSA07WTS4</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>LOUAPPWPL207S02</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>LOUAPPWTL52S01</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>LOUAPPWTL52S02</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>LOUAPPWTS208</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>LOUAPPWTS1047</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>LOUSQLWTS675</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>LOUWEBWPL326S01</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>LOUWEBWTS370</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>LOUXAHWTG99S001</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>LTLSECWTX85</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>PURAPPWPS08</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>SIMXAHWTG99S001</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>SIMXDWDIGW622</name>
+        </properties>
+      </server>
+    </group>
+    <group>
+      <properties>
+        <expanded>False</expanded>
+        <name>Cluster Servers</name>
+      </properties>
+      <group>
+        <properties>
+          <expanded>True</expanded>
+          <name>Patch testing group</name>
+        </properties>
+        <server>
+          <properties>
+            <name>GRBSQLWTM03S01</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <name>GRBSQLWTM03S02</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <name>LTLSQLWTM03S01.loutap.loutms.tree</name>
+          </properties>
+        </server>
+      </group>
+    </group>
+    <group>
+      <properties>
+        <expanded>False</expanded>
+        <name>Hyper-V</name>
+      </properties>
+      <server>
+        <properties>
+          <name>LOUHPVWTW002</name>
+        </properties>
+      </server>
+    </group>
+    <group>
+      <properties>
+        <expanded>False</expanded>
+        <name>Jim's Machines</name>
+      </properties>
+      <server>
+        <properties>
+          <displayName>LOUHPVWTW001 Hyper-V Server</displayName>
+          <name>LOUHPVWTW001</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>LOUXDWTSSA0500</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>LOUXDWTSSA1300</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>SIMXDWWTSB0053</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>WKR90G2GDK</name>
+        </properties>
+      </server>
+    </group>
+    <group>
+      <properties>
+        <expanded>False</expanded>
+        <name>NAS Servers</name>
+      </properties>
+      <server>
+        <properties>
+          <name>LOUNASWPS08</name>
+        </properties>
+      </server>
+    </group>
+    <group>
+      <properties>
+        <expanded>False</expanded>
+        <name>OSD Masters</name>
+      </properties>
+      <server>
+        <properties>
+          <name>ATSPXEWPW01</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>CITPXEWPW01</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>CITPXEWPW02</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>DSIPXEWPW22</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>DSIPXEWPW49</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>DSIPXEWPW95</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>DSIPXEWPW96</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>EUEPXEWPW03</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>FLOPXEWPW23</name>
+        </properties>
+      </server>
+    </group>
+    <group>
+      <properties>
+        <expanded>False</expanded>
+        <name>PCI Data Vault</name>
+      </properties>
+      <server>
+        <properties>
+          <name>LOUSQLWQS414</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>LOUWEBWPL256S01</name>
+        </properties>
+      </server>
+    </group>
+    <group>
+      <properties>
+        <expanded>True</expanded>
+        <name>SCCM</name>
+      </properties>
+      <group>
+        <properties>
+          <expanded>False</expanded>
+          <name>3rd Party Patching POC</name>
+        </properties>
+        <server>
+          <properties>
+            <name>grbloswtw07.loutms.tree</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <name>LTLSSPWTS77</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <name>LTLSSPWTS78</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <name>LTLSSPWTS79</name>
+          </properties>
+        </server>
+      </group>
+      <group>
+        <properties>
+          <expanded>False</expanded>
+          <name>LTL</name>
+        </properties>
+        <server>
+          <properties>
+            <name>LTLSRSWTX01</name>
+          </properties>
+          <logonCredentials inherit="None">
+            <profileName scope="Local">Custom</profileName>
+            <userName>jxp4554a</userName>
+            <password />
+            <domain>LOUTMS</domain>
+          </logonCredentials>
+        </server>
+        <server>
+          <properties>
+            <name>LTLTECWTX27</name>
+          </properties>
+        </server>
+      </group>
+      <group>
+        <properties>
+          <expanded>False</expanded>
+          <name>MDT</name>
+        </properties>
+        <server>
+          <properties>
+            <name>SIMMDTWPS01</name>
+          </properties>
+        </server>
+      </group>
+      <group>
+        <properties>
+          <expanded>False</expanded>
+          <name>MT1</name>
+        </properties>
+        <server>
+          <properties>
+            <displayName>LOUAPPWTS1140 SS</displayName>
+            <name>LOUAPPWTS1140</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWTS1150 DP</displayName>
+            <name>LOUAPPWTS1150</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWTS1151 DP</displayName>
+            <name>LOUAPPWTS1151</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWTS1152 DP</displayName>
+            <name>LOUAPPWTS1152</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUSQLWTS553 DB</displayName>
+            <name>LOUSQLWTS553</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUSRSWTS18 RP</displayName>
+            <name>LOUSRSWTS18</name>
+          </properties>
+        </server>
+      </group>
+      <group>
+        <properties>
+          <expanded>False</expanded>
+          <name>SP1</name>
+        </properties>
+        <server>
+          <properties>
+            <displayName>GRBAPPWPS12 DP</displayName>
+            <name>GRBAPPWPS12</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWPS1740 DP</displayName>
+            <name>LOUAPPWPS1740</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWPS1741 DP</displayName>
+            <name>LOUAPPWPS1741</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWPS1750 DMZ DP</displayName>
+            <name>LOUAPPWPS1750</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWPS1821 DP</displayName>
+            <name>LOUAPPWPS1821</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWPS1822 DP</displayName>
+            <name>LOUAPPWPS1822</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWPS1825 SS</displayName>
+            <name>LOUAPPWPS1825</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <name>LOUSQLWPS618</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <name>LOUSRSWPS20</name>
+          </properties>
+        </server>
+      </group>
+      <group>
+        <properties>
+          <expanded>True</expanded>
+          <name>SQ1</name>
+        </properties>
+        <server>
+          <properties>
+            <displayName>LOUAPPWQS1020 DP</displayName>
+            <name>LOUAPPWQS1020</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWQS1021 DP</displayName>
+            <name>LOUAPPWQS1021</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWQS1022 DP</displayName>
+            <name>LOUAPPWQS1022</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWQS1104 App Cat</displayName>
+            <name>LOUAPPWQS1104</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWQS1150 SS</displayName>
+            <name>LOUAPPWQS1150</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <name>LOUSQLWQS534</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <name>LOUSRSWQS06</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LTLSCMDPWTS01.loutap.loutms.tree</displayName>
+            <name>10.111.240.187</name>
+          </properties>
+        </server>
+      </group>
+      <group>
+        <properties>
+          <expanded>False</expanded>
+          <name>TST</name>
+        </properties>
+        <server>
+          <properties>
+            <displayName>LOUAPPWTS765 MP</displayName>
+            <name>LOUAPPWTS765</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWTS872 SS</displayName>
+            <name>LOUAPPWTS872</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWTS873 DP FSP MP SUP</displayName>
+            <name>LOUAPPWTS873</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <name>LOUAPPWTS874</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <name>LOUSQLWTS402</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <name>LOUSRSWTS09</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <name>LTLSCCMWTS01</name>
+          </properties>
+        </server>
+      </group>
+      <group>
+        <properties>
+          <expanded>False</expanded>
+          <name>WP1</name>
+          <comment>ConfigMGR 1511 Stand Alone Primary</comment>
+        </properties>
+        <server>
+          <properties>
+            <displayName>LOUAPPWPS1642 LDC DP</displayName>
+            <name>LOUAPPWPS1642</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWPS1643 LDC DP</displayName>
+            <name>LOUAPPWPS1643</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWPS1644 LDC DP</displayName>
+            <name>LOUAPPWPS1644</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWPS1645 LDC DP</displayName>
+            <name>LOUAPPWPS1645</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWPS1646 LDC DP</displayName>
+            <name>LOUAPPWPS1646</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWPS1647 LDC DP</displayName>
+            <name>LOUAPPWPS1647</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWPS1648 GB DP</displayName>
+            <name>LOUAPPWPS1648</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWPS1649 SDC DP</displayName>
+            <name>LOUAPPWPS1649</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWPS1653 SDC DP</displayName>
+            <name>LOUAPPWPS1653</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWPS1654 SDC DP</displayName>
+            <name>LOUAPPWPS1654</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWPS1655 SDC DP</displayName>
+            <name>LOUAPPWPS1655</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWPS1656 SDC DP</displayName>
+            <name>LOUAPPWPS1656</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWPS1657 SDC DP</displayName>
+            <name>LOUAPPWPS1657</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWPS1658 SS</displayName>
+            <name>LOUAPPWPS1658</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWPS1700 DMZ DP</displayName>
+            <name>LOUAPPWPS1700</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWPS1701 DMZ DP</displayName>
+            <name>LOUAPPWPS1701</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWPS1823 App Cat</displayName>
+            <name>LOUAPPWPS1823</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWPS1824 App Cat</displayName>
+            <name>LOUAPPWPS1824</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <name>LOUCADWPS04</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <name>LOUSQLWPS606</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <name>LOUSRSWPS18</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <name>SIMMDTWPS01</name>
+          </properties>
+        </server>
+      </group>
+      <group>
+        <properties>
+          <expanded>False</expanded>
+          <name>WQ1</name>
+        </properties>
+        <server>
+          <properties>
+            <displayName>LOUAPPWQS1023 DP</displayName>
+            <name>LOUAPPWQS1023</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWQS1024 DP</displayName>
+            <name>LOUAPPWQS1024</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWQS1025 DP</displayName>
+            <name>LOUAPPWQS1025</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWQS1105 App Cat</displayName>
+            <name>LOUAPPWQS1105</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWQS1151 SS</displayName>
+            <name>LOUAPPWQS1151</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <name>LOUSQLWQS535</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <name>LOUSRSWQS07</name>
+          </properties>
+        </server>
+      </group>
+      <group>
+        <properties>
+          <expanded>True</expanded>
+          <name>WSUS</name>
+        </properties>
+        <server>
+          <properties>
+            <name>LOUAPPWPS1405</name>
+          </properties>
+        </server>
+        <server>
+          <properties>
+            <displayName>LOUAPPWPS1742 Upstream WSUS</displayName>
+            <name>LOUAPPWPS1742</name>
+          </properties>
+        </server>
+      </group>
+    </group>
+    <group>
+      <properties>
+        <expanded>False</expanded>
+        <name>SCOM</name>
+      </properties>
+      <server>
+        <properties>
+          <name>LOUSCMWPS02</name>
+        </properties>
+      </server>
+    </group>
+    <group>
+      <properties>
+        <expanded>False</expanded>
+        <name>SCORCH</name>
+      </properties>
+      <server>
+        <properties>
+          <displayName>LOUAPPWPS819 Scorch</displayName>
+          <name>LOUAPPWPS819</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <displayName>LOUAPPWPS1743 SCORCH RunBook</displayName>
+          <name>LOUAPPWPS1743</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <displayName>LOUAPPWPS1744 SCORCH RunBook</displayName>
+          <name>LOUAPPWPS1744</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <displayName>LOUAPPWPS1826 SCORCH Mgmt</displayName>
+          <name>LOUAPPWPS1826</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <displayName>LOUAPPWQS1152 Scorch</displayName>
+          <name>LOUAPPWQS1152</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <displayName>LOUAPPWQS1153 SCORCH RunBook</displayName>
+          <name>LOUAPPWQS1153</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <displayName>LOUAPPWQS1154 SCORCH RunBook</displayName>
+          <name>LOUAPPWQS1154</name>
+        </properties>
+      </server>
+    </group>
+    <group>
+      <properties>
+        <expanded>False</expanded>
+        <name>Spare Servers</name>
+      </properties>
+      <server>
+        <properties>
+          <name>LOUAPPWPS1331</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>LOUAPPWPS1332</name>
+        </properties>
+      </server>
+    </group>
+    <group>
+      <properties>
+        <expanded>False</expanded>
+        <name>Test Servers</name>
+      </properties>
+      <server>
+        <properties>
+          <name>grbmgtwts04</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>LOULOSWTS01</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>LOULOSWTS02</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>LOULOSWTS03</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>LOULOSWTS04</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>LTLLOSWTS10</name>
+        </properties>
+        <logonCredentials inherit="None">
+          <profileName scope="File">LOUTMS\JXP4554A</profileName>
+        </logonCredentials>
+      </server>
+      <server>
+        <properties>
+          <name>LTLLOSWTS115</name>
+        </properties>
+        <logonCredentials inherit="None">
+          <profileName scope="File">LOUTMS\JXP4554A</profileName>
+        </logonCredentials>
+      </server>
+      <server>
+        <properties>
+          <name>LTLLOSWTS116</name>
+        </properties>
+        <logonCredentials inherit="None">
+          <profileName scope="File">LOUTMS\JXP4554A</profileName>
+        </logonCredentials>
+      </server>
+      <server>
+        <properties>
+          <name>LTLLOSWTS117</name>
+        </properties>
+        <logonCredentials inherit="None">
+          <profileName scope="File">LOUTMS\JXP4554A</profileName>
+        </logonCredentials>
+      </server>
+      <server>
+        <properties>
+          <name>LTLLOSWTS118</name>
+        </properties>
+        <logonCredentials inherit="None">
+          <profileName scope="File">LOUTMS\JXP4554A</profileName>
+        </logonCredentials>
+      </server>
+      <server>
+        <properties>
+          <name>LTLLOSWTS119</name>
+        </properties>
+        <logonCredentials inherit="None">
+          <profileName scope="File">LOUTMS\JXP4554A</profileName>
+        </logonCredentials>
+      </server>
+      <server>
+        <properties>
+          <name>LTLLOSWTS120</name>
+        </properties>
+        <logonCredentials inherit="None">
+          <profileName scope="File">LOUTMS\JXP4554A</profileName>
+        </logonCredentials>
+      </server>
+      <server>
+        <properties>
+          <name>ltlmgtwts04</name>
+        </properties>
+        <logonCredentials inherit="None">
+          <profileName scope="File">LOUTMS\JXP4554A</profileName>
+        </logonCredentials>
+      </server>
+    </group>
+    <group>
+      <properties>
+        <expanded>False</expanded>
+        <name>To Decom</name>
+      </properties>
+      <server>
+        <properties>
+          <name>LOUAPPWPS617</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>LOUAPPWPS619</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <displayName>LOUAPPWPS622 CO1820873</displayName>
+          <name>LOUAPPWPS622</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>LOUAPPWPS865</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>LOUAPPWPS867</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>LOUAPPWPS873</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>LOUAPPWTS214</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <displayName>LOUAPPWTS872 CO1820873</displayName>
+          <name>LOUAPPWTS872</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <displayName>LOUAPPWTS873 CO1820873</displayName>
+          <name>LOUAPPWTS873</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <displayName>LOUAPPWTS874 CO1820873</displayName>
+          <name>LOUAPPWTS874</name>
+        </properties>
+      </server>
+      <server>
+        <properties>
+          <name>SIMMDTWPS01</name>
+        </properties>
+      </server>
+    </group>
+    <group>
+      <properties>
+        <expanded>False</expanded>
+        <name>XenApp</name>
+      </properties>
+      <server>
+        <properties>
+          <name>LOUAPPWPS1745</name>
+        </properties>
+      </server>
+    </group>
+  </file>
+  <connected />
+  <favorites>
+    <server>Jim's Remote Desktops\SCCM\SP1\GRBAPPWPS12 DP</server>
+    <server>Jim's Remote Desktops\SCCM\WSUS\LOUAPPWPS1405</server>
+    <server>Jim's Remote Desktops\SCCM\WP1\LOUAPPWPS1642 LDC DP</server>
+    <server>Jim's Remote Desktops\SCCM\WP1\LOUAPPWPS1658 SS</server>
+    <server>Jim's Remote Desktops\SCCM\WP1\LOUAPPWPS1700 DMZ DP</server>
+    <server>Jim's Remote Desktops\SCCM\WP1\LOUAPPWPS1701 DMZ DP</server>
+    <server>Jim's Remote Desktops\SCCM\SP1\LOUAPPWPS1740 DP</server>
+    <server>Jim's Remote Desktops\SCCM\WSUS\LOUAPPWPS1742 Upstream WSUS</server>
+    <server>Jim's Remote Desktops\SCCM\SP1\LOUAPPWPS1750 DMZ DP</server>
+    <server>Jim's Remote Desktops\SCCM\SP1\LOUAPPWPS1825 SS</server>
+    <server>Jim's Remote Desktops\SCCM\SQ1\LOUAPPWQS1020 DP</server>
+    <server>Jim's Remote Desktops\SCCM\WQ1\LOUAPPWQS1023 DP</server>
+    <server>Jim's Remote Desktops\SCCM\SQ1\LOUAPPWQS1150 SS</server>
+    <server>Jim's Remote Desktops\SCCM\WQ1\LOUAPPWQS1151 SS</server>
+    <server>Jim's Remote Desktops\SCCM\MT1\LOUAPPWTS1140 SS</server>
+    <server>Jim's Remote Desktops\SCCM\MT1\LOUAPPWTS1150 DP</server>
+    <server>Jim's Remote Desktops\NAS Servers\LOUNASWPS08</server>
+    <server>Jim's Remote Desktops\Jim's Machines\LOUXDWTSSA1300</server>
+    <server>Jim's Remote Desktops\SCCM\SQ1\LTLSCMDPWTS01.loutap.loutms.tree</server>
+  </favorites>
+  <recentlyUsed />
+</RDCMan>

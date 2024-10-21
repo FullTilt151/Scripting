@@ -1,0 +1,145 @@
+--HW inv from diag tool
+WITH BlackList
+AS (SELECT
+  '00000000-0000-0000-0000-000000000000' smbiosguid
+UNION
+SELECT
+  '03000200-0400-0500-0006-000700080009' -- National Instruments Embedded Controller
+UNION
+SELECT
+  '09C5BE58-04C0-11DF-BBDA-FECD251A000F'
+UNION
+SELECT
+  '22000001-2201-0101-002B-012B0101002C' -- Dell Lattitude
+UNION
+SELECT
+  '458D72D4-89F4-4F3F-B024-7362C47821B8' -- Dell Optiplex 320/330
+UNION
+SELECT
+  '4C4C4544-0000-0010-8000-80C04F000000' -- Dell Lattitude
+UNION
+SELECT
+  '4C4C4544-0000-2010-8020-80C04F202020' -- Dell PowerEdge, OptiPlex
+UNION
+SELECT
+  '4C4C4544-0000-4410-8045-80C04F4C4C20' -- Dell PowerEdge
+UNION
+SELECT
+  '4C4C4544-0000-FF10-80FF-80C04FFFFFFF' -- Dell Precision, OptiPlex
+UNION
+SELECT
+  '4C4C4544-0048-3210-8054-B8C04F325231'
+UNION
+SELECT
+  '4C4C4544-0048-4810-804D-C3C04F4A5331'
+UNION
+SELECT
+  '4C4C4544-004A-3510-804C-B4C04F315131'
+UNION
+SELECT
+  '4C4C4544-0051-3110-8046-B7C04F585631'
+UNION
+SELECT
+  'A2856FE0-F692-11DE-84A9-6FD9F046D98A' -- LENOVO
+UNION
+SELECT
+  'A31E05FC-F692-11DE-9D73-3666DA375B3F' -- LENOVO
+UNION
+SELECT
+  'A3B69E0C-F692-11DE-8B7F-83C88A4083CD' -- LENOVO
+UNION
+SELECT
+  '9EF1E944-F692-11DE-96AE-E9836C0C4947' -- LENOVO
+UNION
+SELECT
+  '9F8A7F60-F692-11DE-BB61-9CF5D4387493' -- LENOVO
+)
+
+SELECT
+  vrs.ResourceId,
+  Name0 HostName,
+  CONVERT(uniqueidentifier, SmBios_Guid0) SmBiosGuid,
+  CASE
+    WHEN COALESCE(Active0, 0) = 1 AND
+      COALESCE(Client0, 0) = 1 AND
+      COALESCE(Obsolete0, 0) = 0 AND
+      COALESCE(Decommissioned0, 0) = 0 THEN CONVERT(bit, 1)
+    ELSE CONVERT(bit, 0)
+  END Active,
+  CASE
+    WHEN SMBIOS_GUID0 IN (SELECT
+        smbiosguid
+      FROM BlackList) THEN CONVERT(bit, 1)
+    ELSE CONVERT(bit, 0)
+  END IsBlackListed,
+  DomainRole
+FROM v_r_system vrs
+LEFT JOIN (SELECT
+
+  RSYS.ResourceID AS resourceId,
+
+
+  CASE
+    WHEN GCOMP1.DomainRole0 = 0 THEN 'Standalone Workstation'
+    WHEN GCOMP1.DomainRole0 = 1 THEN 'Workstation'
+    WHEN GCOMP1.DomainRole0 = 2 THEN 'Standalone Server'
+    WHEN GCOMP1.DomainRole0 = 3 THEN 'Server'
+    WHEN GCOMP1.DomainRole0 = 4 THEN 'Backup DC'
+    WHEN GCOMP1.DomainRole0 = 5 THEN 'Primary DC'
+    ELSE 'Unknown'
+  END DomainRole
+
+FROM dbo.v_R_System RSYS
+
+LEFT OUTER JOIN (SELECT
+
+  GCOMP.ResourceID,
+
+  GCOMP.GroupID,
+
+  MAX(GCOMP.RevisionID) MaxRevision
+
+FROM dbo.v_GS_COMPUTER_SYSTEM GCOMP
+
+INNER JOIN (SELECT
+
+  ResourceID,
+
+  MAX(GroupID) MaxGroup
+
+FROM dbo.v_GS_COMPUTER_SYSTEM
+
+GROUP BY ResourceID) GCOMPMAXGROUP
+  ON GCOMP.ResourceID = GCOMPMAXGROUP.ResourceID
+
+  AND GCOMP.GroupID = GCOMPMAXGROUP.MaxGroup
+
+GROUP BY GCOMP.ResourceID,
+         GCOMP.GroupID) GCOMPMAXGROUPMAXREV
+  ON RSYS.ResourceID = GCOMPMAXGROUPMAXREV.ResourceID
+
+LEFT OUTER JOIN dbo.v_GS_COMPUTER_SYSTEM GCOMP1
+  ON GCOMP1.ResourceID = GCOMPMAXGROUPMAXREV.ResourceID
+
+  AND GCOMP1.GroupID = GCOMPMAXGROUPMAXREV.GroupID
+
+  AND GCOMP1.RevisionID = GCOMPMAXGROUPMAXREV.MaxRevision) t
+  ON t.resourceid = vrs.resourceid
+  where Name0 = 'LOUXDWSTDB2025'
+
+  SELECT
+  Publisher0 Publisher,
+  DisplayName0 DisplayName,
+  Version0 Version,
+  ProdId0 ProductCode
+FROM v_add_remove_programs
+WHERE ResourceId = 16920825 and Publisher0 like 'Oracle%'
+
+SELECT
+  CompanyName0 Publisher,
+  ProductName0 Product,
+  ProductVersion0 Version,
+  LastUsedTime0 LastUsedTime
+FROM v_gs_ccm_recently_Used_apps
+WHERE ResourceId = 16920825 and CompanyName0 like 'Oracle%'
+

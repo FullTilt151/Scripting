@@ -1,0 +1,1 @@
+﻿Get-ADUser -filter {(msNPAllowDialin -eq $false)} -Properties msNPAllowDialIn | Sort-Object Surname | Format-Table -AutoSize Enabled, ObjectClass, Name, Givenname, Surname, SamAccountName, msNPAllowDialIn

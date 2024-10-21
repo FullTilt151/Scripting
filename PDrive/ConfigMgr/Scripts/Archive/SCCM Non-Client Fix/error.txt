@@ -1,0 +1,96 @@
+Couldn't connect to \\hl6cvisioN04\ADMIN$
+Not enough server storage is available to process this command.
+
+Couldn't connect to \\hl6cvisioN11\ADMIN$
+Not enough server storage is available to process this command.
+
+Couldn't connect to \\hl6cvisioN12\ADMIN$
+Not enough server storage is available to process this command.
+
+Couldn't connect to \\hl6cvisioN14\ADMIN$
+Not enough server storage is available to process this command.
+
+Couldn't connect to \\hl6cvisioN18\ADMIN$
+Not enough server storage is available to process this command.
+
+Couldn't connect to \\hl6cvisioN3\ADMIN$
+Not enough server storage is available to process this command.
+
+Couldn't connect to \\hl8phy02\ADMIN$
+Not enough server storage is available to process this command.
+
+Couldn't connect to \\jpgsheahllap01\ADMIN$
+Not enough server storage is available to process this command.
+
+Couldn't connect to \\jtow\ADMIN$
+The network path was not found.
+
+Couldn't connect to \\mcee\ADMIN$
+The network path was not found.
+
+Couldn't connect to \\mcee\ADMIN$
+The network path was not found.
+
+Couldn't connect to \\mceer\ADMIN$
+The network path was not found.
+
+Couldn't connect to \\e1ed06\ADMIN$
+The network path was not found.
+
+Couldn't connect to \\e2admi\ADMIN$
+The network path was not found.
+
+Couldn't connect to \\e2carpul01\ADMIN$
+The network path was not found.
+
+Couldn't connect to \\e2commui\ADMIN$
+The network path was not found.
+
+Couldn't connect to \\e2fraz01\ADMIN$
+The network path was not found.
+
+Couldn't connect to \\e2fraz03\ADMIN$
+The network path was not found.
+
+Couldn't connect to \\e2i\ADMIN$
+The network path was not found.
+
+Couldn't connect to \\e2i\ADMIN$
+The network path was not found.
+
+Couldn't connect to \\olop3\ADMIN$
+The network path was not found.
+
+Couldn't connect to \\olop3\ADMIN$
+The network path was not found.
+
+Couldn't connect to \\pdv\ADMIN$
+The network path was not found.
+
+Couldn't connect to \\pscapp\ADMIN$
+The network path was not found.
+
+Couldn't start remote service
+The system cannot find the file specified.
+
+Couldn't connect to \\10.53.131.236\ADMIN$
+Logon failure: unknown user name or bad password.
+
+Couldn't connect to \\smefzlp06\ADMIN$
+The network path was not found.
+
+Couldn't connect to \\smelpb\ADMIN$
+The network path was not found.
+
+Couldn't connect to \\tpgc\ADMIN$
+The network path was not found.
+
+Couldn't connect to \\tpgvly18\ADMIN$
+No more connections can be made to this remote computer at this time because there are already as many connections as the computer can accept.
+
+Couldn't connect to \\tra\ADMIN$
+The network path was not found.
+
+Couldn't connect to \\us42lap01\ADMIN$
+Not enough server storage is available to process this command.
+

@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<Settings>
+    <GeneralSettings>
+        <PrimarySiteServer>mas-cmpri01.dartcontainer.com</PrimarySiteServer>
+        <LogPath>c:\scriptlogs</LogPath>
+    </GeneralSettings>
+    <EmailSettings>
+		<NotificationsEnabled>True</NotificationsEnabled>
+        <FromAddress>ConfigMgrDistribution@dart.biz</FromAddress>
+        <SMTPServer>smtp.dart.biz</SMTPServer>
+    </EmailSettings>
+    <DistributionSettings>
+        <DistributionCheckInterval>60</DistributionCheckInterval>
+        <DPTableType>DPGroup</DPTableType>
+        <Action>Distribute Content</Action>
+    </DistributionSettings>
+</Settings>

@@ -1,0 +1,1 @@
+﻿Import-CMComputerInformation -CollectionName "XenApp OSD Staging" -ComputerName CTXW2K12R2Base -MacAddress 00:11:22:33:44:55

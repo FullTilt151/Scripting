@@ -1,0 +1,8 @@
+rem hw
+am_sms_ex.exe /s:LOUAPPWPS534 /u:humad\ecmadmin /p:d54us$yEYe /c:RPT /D:"F:\Program Files\CA\DSM\AssetCollectorCollect" /trustlevel:4 /r:"F:\Program Files\CA\DSM\logs\am_sms_ex_hw.log" /collect_hw
+
+rem sw
+am_sms_ex.exe /s:LOUAPPWPS534 /u:humad\ecmadmin /p:d54us$yEYe /c:RPT /D:"F:\Program Files\CA\DSM\AssetCollectorCollect" /trustlevel:4 /r:"F:\Program Files\CA\DSM\logs\am_sms_ex_sw.log" /collect_sw
+
+
+rem cftrace -c set -f UAM -pp SMSEX -l detail -s 75000 -ln 9

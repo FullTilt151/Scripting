@@ -1,0 +1,35 @@
+[02-03-2021: 07:53:56] ---------------------------------------------------------------
+[02-03-2021: 07:53:56]  script started on: 02-03-2021 at: 07:53:56
+[02-03-2021: 07:53:56] ---------------------------------------------------------------
+[02-03-2021: 07:54:58] Shopping SQL ConnectString: Server=LOUAPPWQS513.rsc.humad.com;Database=Shopping2;Trusted_Connection=True
+[02-03-2021: 07:54:58] Backup Preference Table to: C:\Users\MXC4183A\Repos\SCCM-PowerShell_Scripts\MXC4183\1E\PreferencesBackup.xml
+[02-03-2021: 07:55:13] the query: SELECT TOP 1 SUBSTRING(Version, 1, LEN(Version) - CHARINDEX('.', REVERSE(Version), 0)) as Data FROM  dbo.tb_VersionHistory ORDER BY ID DESC 
+ returned no results
+[02-03-2021: 07:55:14] the query: SELECT PreferenceName,PreferenceValue FROM tb_Preference WHERE PreferenceName = 'AD Server' 
+ returned no results
+[02-03-2021: 07:55:14] the query: SELECT PreferenceName,PreferenceValue FROM tb_Preference WHERE PreferenceName = 'ActiveEfficiency ServerName' 
+ returned no results
+[02-03-2021: 07:55:14] the query: SELECT PreferenceName,PreferenceValue FROM tb_Preference WHERE PreferenceName = 'Admin Account' 
+ returned no results
+[02-03-2021: 07:55:14] the query: SELECT PreferenceName,PreferenceValue FROM tb_Preference WHERE PreferenceName = 'ConfigMgr Database Access Group' 
+ returned no results
+[02-03-2021: 07:55:14] the query: SELECT PreferenceName,PreferenceValue FROM tb_Preference WHERE PreferenceName = 'ConfigMgr Central Server Name' 
+ returned no results
+[02-03-2021: 07:55:14] the query: SELECT PreferenceName,PreferenceValue FROM tb_Preference WHERE PreferenceName = 'Full Database Access Group' 
+ returned no results
+[02-03-2021: 07:55:14] the query: SELECT PreferenceName,PreferenceValue FROM tb_Preference WHERE PreferenceName = 'Global License Manager Account' 
+ returned no results
+[02-03-2021: 07:55:14] the query: SELECT PreferenceName,PreferenceValue FROM tb_Preference WHERE PreferenceName = 'Limited Database Access Group' 
+ returned no results
+[02-03-2021: 07:55:14] the query: SELECT PreferenceName,PreferenceValue FROM tb_Preference WHERE PreferenceName = 'Receiver Account' 
+ returned no results
+[02-03-2021: 07:55:15] the query: SELECT PreferenceName,PreferenceValue FROM tb_Preference WHERE PreferenceName = 'Reports Account' 
+ returned no results
+[02-03-2021: 07:55:15] the query: SELECT PreferenceName,PreferenceValue FROM tb_Preference WHERE PreferenceName = 'Service Account' 
+ returned no results
+[02-03-2021: 07:55:15] the query: SELECT PreferenceName,PreferenceValue FROM tb_Preference WHERE PreferenceName = 'SMTP Server' 
+ returned no results
+[02-03-2021: 07:55:15] the query: SELECT PreferenceName,PreferenceValue FROM tb_Preference WHERE PreferenceName = 'Web Url' 
+ returned no results
+[02-03-2021: 07:55:15] the query: SELECT PreferenceName,PreferenceValue FROM tb_Preference WHERE PreferenceName = 'Use Global Catalog' 
+ returned no results

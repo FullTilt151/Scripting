@@ -1,0 +1,23 @@
+Description=This packet type is for testing the IAX2 service.
+; The contents uses the same format as the cargo setting in the PingPlotter Packet Options dialog - 
+; \xFF (where FF = a hex value)
+; \255 (where 255 is an decimal value from 000 to 255)
+; \r or \n for CR or LF
+; \SAMPLENUM for text value of the current sample number (or SAMPLENUM_BIN for 4 byte binary version of same)
+; \SEQNUM for TCP/IP sequence number (or SEQNUM_BIN for the 2 byte binary representation of that)
+; \HOPNUM for the hop number of that packet, or HOPNUM_BIN for the 1 byte hop number.
+PacketContents=\x80\x00\SEQNUM_BIN\SAMPLENUM_BIN\x00\x00\x06\x1e
+; Auto sizing of packets means that it's based on "PacketContents" once it's parsed out.
+PacketSize=Auto
+; The default UDP port - it can be changed, though.
+UDPPort=4569
+; We may need to send a reply back to close the conversation.  If we 
+; get a match on a specific byte (Byte number:Byte value in xFF or 255 format),
+; then send a reply.  The byte number can be decimal or hex (hex begins with x)
+RespondIfMatch=12:x03
+; The response can use any of the values above (\SAMPLENUM, etc), plus any byte
+; can be copied from the reply.  The reply byte is in the format of:
+; \BYTE0001 (where 0001 is the byte number of the reply data (in decimal)).
+ResponseCargo=\x80\x00\BYTE0000:07\BYTE0001\BYTE0004\BYTE0005\BYTE0006\BYTE0007\BYTE0009\BYTE0009\x06\x04
+
+

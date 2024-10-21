@@ -1,0 +1,1 @@
+runas /user:humad\dxr5354a cmd

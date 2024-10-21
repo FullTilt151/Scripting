@@ -1,0 +1,7 @@
+@echo off
+sc query ccmexec | find /i "ccmexec"
+IF ERRORLEVEL 1 (
+set HasSCCMClient=0
+) ELSE (
+set HasSCCMClient=1
+)

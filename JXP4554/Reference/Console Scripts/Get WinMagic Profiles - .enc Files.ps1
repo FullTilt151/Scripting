@@ -1,0 +1,1 @@
+Get-ChildItem -Path 'C:\Program Files\WinMagic\SecureDoc-NT\UserData' -Filter "*.ENC" | Select-Object -ExpandProperty Name

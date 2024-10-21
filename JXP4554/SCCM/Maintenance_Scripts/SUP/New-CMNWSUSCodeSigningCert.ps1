@@ -1,0 +1,5 @@
+[Reflection.Assembly]::LoadWithPartialName("Microsoft.UpdateServices.Administration")
+$updateServer = [Microsoft.UpdateServices.Administration.AdminProxy]::GetUpdateServer()
+$config = $updateServer.GetConfiguration()
+$config.SetSigningCertificate("C:\Temp\WSUS.pem","P@ssw0rd")
+$config.Save()

@@ -1,0 +1,1 @@
+start CMTrace C:\Temp\WSUSUpdateList.log C:\Temp\WSUSMaintenance.log "D:\Program Files\Microsoft Configuration Manager\Logs\WCM.log" "D:\Program Files\Microsoft Configuration Manager\Logs\wsyncmgr.log"

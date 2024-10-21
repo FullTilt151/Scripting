@@ -1,0 +1,1 @@
+C:\Windows\SysWOW64\WindowsPowerShell\v1.0\PowerShell.exe %~dp0Create-SUGNonComplianceGroups.ps1

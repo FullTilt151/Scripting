@@ -1,0 +1,1 @@
+> Get-CimInstance? Win32Reg_MBAMPolicy -ComputerName WKPF2KTGAJ

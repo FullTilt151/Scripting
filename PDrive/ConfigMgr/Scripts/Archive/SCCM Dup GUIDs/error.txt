@@ -1,0 +1,52 @@
+Invalid drive specification
+Invalid drive specification
+Invalid drive specification
+Invalid drive specification
+Invalid drive specification
+Invalid drive specification
+Invalid drive specification
+Invalid drive specification
+Invalid drive specification
+Invalid drive specification
+Invalid drive specification
+Invalid drive specification
+Invalid drive specification
+Invalid drive specification
+Invalid drive specification
+Invalid drive specification
+Invalid drive specification
+Invalid drive specification
+Invalid drive specification
+Invalid drive specification
+Invalid drive specification
+Invalid drive specification
+Invalid drive specification
+Invalid drive specification
+Invalid drive specification
+Invalid drive specification
+Invalid drive specification
+Invalid drive specification
+Invalid drive specification
+Invalid drive specification
+Invalid drive specification
+Invalid drive specification
+Invalid drive specification
+Invalid drive specification
+Invalid drive specification
+Invalid drive specification
+Couldn't connect to \\10.53.1.44\ADMIN$
+No network provider accepted the given network path.
+
+Couldn't connect to \\10.51.9.251\ADMIN$
+Not enough server storage is available to process this command.
+
+Couldn't connect to \\10.51.9.221\ADMIN$
+Not enough server storage is available to process this command.
+
+Couldn't connect to \\172.21.6.252\ADMIN$
+Not enough server storage is available to process this command.
+
+Couldn't connect to \\172.24.6.26\ADMIN$
+No network provider accepted the given network path.
+
+^C^C

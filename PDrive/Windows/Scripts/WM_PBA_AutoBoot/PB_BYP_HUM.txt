@@ -1,0 +1,22 @@
+These are the unencoded (plain text) single line command strings that can be executed using the SCCM "Run Command Line" step in the task sequence.
+NOTE:  \ is necessary to escape the " for each parameter.
+NOTE:  Replace xxx with the real username and password.
+
+
+Command 1:
+---
+Powershell.exe -command "& {'SDUTIL /u /keyfile\"xxx\" /pwd\"xxx\" /c\"8\" /t\"8\" /Silent' | Out-File 'C:\Program Files\WinMagic\SecureDoc-NT\Bypass.ini' -encoding Unicode}"
+
+
+
+Command 2 (Check if the file was created from command 1 and that sdbat is not running):
+---
+Powershell.exe -command "& {if((Test-Path 'C:\Program Files\WinMagic\SecureDoc-NT\Bypass.ini') -and -not (Get-Process sdbat -ErrorAction Ignore)) {& 'C:\Program Files\WinMagic\SecureDoc-NT\SDBat.exe' 'C:\Program Files\WinMagic\SecureDoc-NT\Bypass.ini' | Out-Null; Remove-Item -path 'C:\Program Files\WinMagic\SecureDoc-NT\Bypass.ini' -ErrorAction Ignore; Remove-Item -path 'C:\Program Files\WinMagic\SecureDoc-NT\Userdata\sdbat.log' -ErrorAction Ignore; Exit(0)} else {Remove-Item -path 'C:\Program Files\WinMagic\SecureDoc-NT\Bypass.ini' -ErrorAction Ignore; Remove-Item -path 'C:\Program Files\WinMagic\SecureDoc-NT\Userdata\sdbat.log' -ErrorAction Ignore; EXIT(1)}}"
+
+
+
+
+
+
+
+

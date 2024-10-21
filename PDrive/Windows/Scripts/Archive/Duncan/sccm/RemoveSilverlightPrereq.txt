@@ -1,0 +1,5 @@
+:LDC:
+C:\temp\SCCM-1E\ccmsetup.exe /SOURCE:C:\temp\SCCM-1E /skipprereq:silverlight.exe SMSSITECODE=LDC DNSSUFFIX=rsc.humad.com SMSMP=LOUAPPWPS872.rsc.humad.com SMSFSP=LOUAPPWPS817.rsc.humad.com SMSCACHESIZE=10240 REINSTALLMODE=vomus
+
+:SDC:
+C:\temp\SCCM-1E\ccmsetup.exe /SOURCE:C:\temp\SCCM-1E /skipprereq:silverlight.exe SMSSITECODE=SDC DNSSUFFIX=rsc.humad.com SMSMP=LOUAPPWPS620.rsc.humad.com SMSFSP=LOUAPPWPS618.rsc.humad.com SMSCACHESIZE=10240 REINSTALLMODE=vomus

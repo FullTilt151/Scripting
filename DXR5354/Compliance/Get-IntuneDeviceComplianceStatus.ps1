@@ -1,0 +1,17 @@
+import-module Microsoft.Graph.Intune
+Connect-MSGraph
+
+$id = '963aa3a9-3a22-4915-8bea-849e085cec6c' # Windows 10 Compliance Policy - Hybrid
+
+Get-IntuneDeviceCompliancePolicyDeviceStatus
+Get-IntuneDeviceCompliancePolicyUserStatus
+Get-IntuneDeviceComplianceSettingState
+Get-IntuneManagedDeviceDeviceCompliancePolicyState
+Get-DeviceManagement_DeviceCompliancePolicies_DeviceStatuses
+Get-DeviceManagement_DeviceCompliancePolicies_DeviceStatusOverview
+Get-DeviceManagement_DeviceCompliancePolicies_UserStatuses
+Get-DeviceManagement_DeviceCompliancePolicies_UserStatusOverview
+Get-DeviceManagement_ManagedDevices_DeviceCompliancePolicyStatescls
+
+
+# WKPC16LPLN

@@ -1,0 +1,5 @@
+https://dev.azure.com/humana/SCS/_git/SCCM-PowerShell_Scripts?path=%2FStable%20Scripts%2FBrowsers%2FEnterpriseModeSiteList&version=GBmaster
+ $select=Name,WorkItemType,State,CreatedDate
+    &$filter=startswith(Area/AreaPath,'{area path}')
+    &$orderby=CreatedDate desc
+    &$top=10

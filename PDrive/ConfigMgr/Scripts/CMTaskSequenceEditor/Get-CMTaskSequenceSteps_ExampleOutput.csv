@@ -1,0 +1,144 @@
+"Index","Group","Name","ObjectClass","PackageID","Description","Enabled","ContinueOnError","SupportedEnvironment","ConditionType","Condition","Property0","Property1","Property2","Property3","Property4","Property5","Property6","Property7","Property8","Property9","Property10","Property11","Property12","Property13","Property14","Property15","Property16","Property17","Property18","Property19","Property20"
+"1",,"Use Toolkit Package","BDD_UsePackage","CM100018","","True","False","WinPEandFullOS",,," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "
+"2",,"Gather","BDD_Gather","CM100019","","True","False","WinPEandFullOS",,,"GatherLocalOnly: False","RulesFile: customsettings.ini"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "
+"3","Install Applications","Install Applications","SMS_TaskSequence_Group",,"","True","False",,,," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "
+"4","Install Applications","Install CMTrace - Package","SMS_TaskSequence_InstallSoftwareAction","CM100011","","True","False","FullOS",,,"BaseVariableName: ","ContinueOnInstallError: ","ProgramName: Install"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "
+"5","Install Applications","Install CMTrace - App","SMS_TaskSequence_InstallApplicationAction",,"","True","False","FullOS",,,"AppInfo: 
+instance of SMS_TaskSequence_ApplicationInfo
+{
+	Description = ""Valid"";
+	DisplayName = ""Configuration Manager Trace Log Tool"";
+	Name = ""ScopeId_02D1E5C7-246E-4067-9A6F-FF2DBAFC740C/Application_f60eb729-9470-4260-9c88-b75197c5fee2"";
+};
+","ApplicationName: ScopeId_02D1E5C7-246E-4067-9A6F-FF2DBAFC740C/Application_f60eb729-9470-4260-9c88-b75197c5fee2","BaseVariableName: ","ContinueOnInstallError: False","NumApps: 1","RetryCount: 2"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "
+"6","Apps Broken","Apps Broken","SMS_TaskSequence_Group",,"","True","False",,,," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "
+"7","Apps Broken","Restart Computer","SMS_TaskSequence_RebootAction",,"","True","False","WinPEandFullOS",,,"Message: ","MessageTimeout: 1","Target: HD"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "
+"8",,"Run Fake PowerShell Script","SMS_TaskSequence_RunPowerShellScriptAction","CM100018","Does nothing","True","False","WinPEandFullOS",,,"ExecutionPolicy: Bypass","Parameters: -Param $false","ScriptName: Get-Nothing.ps1"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "
+"9",,"Run Fake PowerShell Script - Condition","SMS_TaskSequence_RunPowerShellScriptAction","CM100018","","True","False","WinPEandFullOS",,,"ExecutionPolicy: Bypass","Parameters: -Param $false","ScriptName: Get-Nothing.ps1"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "
+"10",,"Set FakeVariable","SMS_TaskSequence_SetVariableAction",,"Set fake var","True","True","WinPEandFullOS",,,"VariableName: FakeVariable","VariableValue: idontexist"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "
+"11",,"Set FakeVariable - Disabled","SMS_TaskSequence_SetVariableAction",,"","False","False","WinPEandFullOS",,,"VariableName: FakeVariable","VariableValue: idontexist"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "
+"12","Group Uno","Group Uno","SMS_TaskSequence_Group",,"","True","False",,,," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "
+"13","Group Uno","Install Software Updates","SMS_TaskSequence_InstallUpdateAction",,"","True","False","FullOS",,,"RetryCount: 2","Target: Mandatory"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "
+"14",,"Cond Test 4a","SMS_TaskSequence_RunCommandLineAction",,"","True","False","WinPEandFullOS","SMS_TaskSequence_FolderConditionExpression","Folder: C:\temp","CommandLine: cmd /c","DisableWow64Redirection: False","RunAsUser: False","SuccessCodes: 0 3010","UserName: ","UserPassword: ","WorkingDirectory: "," "," "," "," "," "," "," "," "," "," "," "," "," "," "
+"15",,"Cond Test 4b","SMS_TaskSequence_RunCommandLineAction",,"","True","False","WinPEandFullOS","SMS_TaskSequence_FolderConditionExpression","Folder: C:\temp
+DateTime notEquals 10/10/2015 22:13:52","CommandLine: cmd /c","DisableWow64Redirection: False","RunAsUser: False","SuccessCodes: 0 3010","UserName: ","UserPassword: ","WorkingDirectory: "," "," "," "," "," "," "," "," "," "," "," "," "," "," "
+"16",,"Cond Test 5a","SMS_TaskSequence_RunCommandLineAction",,"","True","False","WinPEandFullOS","SMS_TaskSequence_RegistryConditionExpression","Key: HKEY_LOCAL_MACHINE\Software\Humana\OSD
+Type: REG_SZ
+Condition: exists","CommandLine: cmd /c","DisableWow64Redirection: False","RunAsUser: False","SuccessCodes: 0 3010","UserName: ","UserPassword: ","WorkingDirectory: "," "," "," "," "," "," "," "," "," "," "," "," "," "," "
+"17",,"Cond Test 5b","SMS_TaskSequence_RunCommandLineAction",,"","True","False","WinPEandFullOS","SMS_TaskSequence_RegistryConditionExpression","Key: HKEY_CURRENT_USER\Software\Humana\OSD
+Type: REG_SZ
+Condition: equals 1","CommandLine: cmd /c","DisableWow64Redirection: False","RunAsUser: False","SuccessCodes: 0 3010","UserName: ","UserPassword: ","WorkingDirectory: "," "," "," "," "," "," "," "," "," "," "," "," "," "," "
+"18",,"Cond Test 5c","SMS_TaskSequence_RunCommandLineAction",,"","True","False","WinPEandFullOS","SMS_TaskSequence_RegistryConditionExpression","Key: HKEY_USERS\Software\Humana\OSD
+Type: REG_EXPAND_SZ
+Condition: less 12345","CommandLine: cmd /c","DisableWow64Redirection: False","RunAsUser: False","SuccessCodes: 0 3010","UserName: ","UserPassword: ","WorkingDirectory: "," "," "," "," "," "," "," "," "," "," "," "," "," "," "
+"19",,"Cond Test 6","SMS_TaskSequence_RunCommandLineAction",,"","True","False","WinPEandFullOS","SMS_TaskSequence_WMIConditionExpression","Namespace: root\cimv2
+Query: select * from win32_bios where asd = '123'","CommandLine: cmd /c","DisableWow64Redirection: False","RunAsUser: False","SuccessCodes: 0 3010","UserName: ","UserPassword: ","WorkingDirectory: "," "," "," "," "," "," "," "," "," "," "," "," "," "," "
+"20",,"Cond Test 7a","SMS_TaskSequence_RunCommandLineAction",,"","True","False","WinPEandFullOS","SMS_TaskSequence_SoftwareConditionExpression","ThisVersion of 
+ProductCode: {6BC341F4-9A8F-4956-BDEF-4E07ADE9F1B7}
+Product: Microsoft Deployment Toolkit 2013 Update 1 (6.3.8290.1000)
+UpgradeCode: {42D9191C-0C0E-45E5-BB94-2DF35BB6C10C}
+Version: 6.3.8290.1000","CommandLine: cmd /c","DisableWow64Redirection: False","RunAsUser: False","SuccessCodes: 0 3010","UserName: ","UserPassword: ","WorkingDirectory: "," "," "," "," "," "," "," "," "," "," "," "," "," "," "
+"21",,"Cond Test 7b","SMS_TaskSequence_RunCommandLineAction",,"","True","False","WinPEandFullOS","SMS_TaskSequence_SoftwareConditionExpression","AnyVersion of 
+ProductCode: {6BC341F4-9A8F-4956-BDEF-4E07ADE9F1B7}
+Product: Microsoft Deployment Toolkit 2013 Update 1 (6.3.8290.1000)
+UpgradeCode: {42D9191C-0C0E-45E5-BB94-2DF35BB6C10C}
+Version: 6.3.8290.1000","CommandLine: cmd /c","DisableWow64Redirection: False","RunAsUser: False","SuccessCodes: 0 3010","UserName: ","UserPassword: ","WorkingDirectory: "," "," "," "," "," "," "," "," "," "," "," "," "," "," "
+"22",,"Cond Test 8a","SMS_TaskSequence_RunCommandLineAction",,"","True","False","WinPEandFullOS","SMS_TaskSequence_ConditionOperator","Logic: not
+
+TSVariable: OSD1 equals true
+Namespace:  root\cimv2
+Query:  select * from win32_bios1
+
+
+TSVariable: OSD1 equals true
+Namespace:  root\cimv2
+Query:  select * from win32_bios1
+
+","CommandLine: cmd /c","DisableWow64Redirection: False","RunAsUser: False","SuccessCodes: 0 3010","UserName: ","UserPassword: ","WorkingDirectory: "," "," "," "," "," "," "," "," "," "," "," "," "," "," "
+"23",,"Cond Test 8b","SMS_TaskSequence_RunCommandLineAction",,"","True","False","WinPEandFullOS","SMS_TaskSequence_ConditionOperator","Logic: or
+
+TSVariable: OSD1 equals true
+Namespace:  root\cimv2 
+Query:  select * from win32_bios1 
+
+
+TSVariable: OSD1 equals true
+Namespace:  root\cimv2 
+Query:  select * from win32_bios1 
+
+
+TSVariable: OSD1 equals true
+Namespace:  root\cimv2 
+Query:  select * from win32_bios1 
+
+","CommandLine: cmd /c","DisableWow64Redirection: False","RunAsUser: False","SuccessCodes: 0 3010","UserName: ","UserPassword: ","WorkingDirectory: "," "," "," "," "," "," "," "," "," "," "," "," "," "," "
+"24",,"Cond Test 8c","SMS_TaskSequence_RunCommandLineAction",,"","True","False","WinPEandFullOS","SMS_TaskSequence_ConditionOperator","Logic: and
+
+TSVariable: OSD1 equals true
+Namespace:  root\cimv2  
+Query:  select * from win32_bios1  
+
+
+TSVariable: OSD1 equals true
+Namespace:  root\cimv2  
+Query:  select * from win32_bios1  
+
+
+TSVariable: OSD1 equals true
+Namespace:  root\cimv2  
+Query:  select * from win32_bios1  
+
+
+TSVariable: OSD1 equals true
+Namespace:  root\cimv2  
+Query:  select * from win32_bios1  
+
+","CommandLine: cmd /c","DisableWow64Redirection: False","RunAsUser: False","SuccessCodes: 0 3010","UserName: ","UserPassword: ","WorkingDirectory: "," "," "," "," "," "," "," "," "," "," "," "," "," "," "
+"25",,"Configure ADDS","BDD_ConfigureADDS",,"","True","False","WinPEandFullOS",,,"ADDSLogPath: %systemroot%\NTDS","ADDSPassword: @dmin02","ADDSUserDomain: domain","ADDSUserName: admin01","AutoConfigDNS: No","ChildName: dc01","ConfirmGC: Yes","CriticalReplicationOnly: No","DatabasePath: %systemroot%\NTDS","DomainLevel: 0","DomainNetBiosName: DOMAIN.ROOT.COM","ForestLevel: 0","NewDomain: Child","NewDomainDNSName: ","ParentDomainDNSName: DOMAIN.ROOT","ReplicaDomainDNSName: ","ReplicaOrNewDomain: Domain","ReplicationSourceDC: ","SafeModeAdminPassword: P@ssW0rd1","SiteName: ","SysVolPath: %systemroot%\SYSVOL"
+"26","Test Group","Test Group","SMS_TaskSequence_Group",,"","True","False",,,," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "
+"27","Test Group","Set Random Variables","SMS_TaskSequence_SetDynamicVariablesAction",,"","True","False","WinPEandFullOS",,,"Rules: 
+instance of SMS_TaskSequence_Rule
+{
+	Condition = 
+instance of SMS_TaskSequence_Condition
+{
+	Operands = {
+instance of SMS_TaskSequence_MakeModelConditionExpression
+{
+	Make = ""Dell"";
+	Model = ""Latitude E5450"";
+}};
+};
+	Variables = {
+instance of SMS_TaskSequence_Variable
+{
+	Name = ""OSDPreserveDriveLetter"";
+	Value = ""True"";
+}};
+};
+"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "
+"28","Test Group","Join Domain or Workgroup","SMS_TaskSequence_JoinDomainWorkgroupAction",,"","True","False","FullOS",,,"DomainName: ","DomainOUName: ","DomainPassword: ","DomainUsername: ","SkipReboot: False","Type: 1","WorkgroupName: DOM021"," "," "," "," "," "," "," "," "," "," "," "," "," "," "
+"29","Test Group","Connect to Network Folder","SMS_TaskSequence_ConnectNetworkFolderAction",,"","True","False","WinPEandFullOS",,,"DriveLetter: X:","Password: 	
+","Path: \\server01\share","Username: domain\user01"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "
+"30","Test Group","Check Readiness","SMS_TaskSequence_PrestartCheckAction",,"","True","False","WinPEandFullOS",,,"CheckFreeDiskSpace: True","CheckMemory: True","CheckOSType: True","CheckProcessorSpeed: True","FreeDiskSpace: 1000","Memory: 1024","OSType: CLIENT","ProcessorSpeed: 1400"," "," "," "," "," "," "," "," "," "," "," "," "," "
+"31","Test Group","Format and Partition Disk","SMS_TaskSequence_PartitionDiskAction",,"","True","False","WinPE",,,"DiskIndex: 0","DiskpartBiosCompatibilityMode: False","DiskType: BASIC","GPTBootDisk: False","Partitions: 
+instance of SMS_TaskSequence_PartitionSettings
+{
+	AssignVolumeLetter = FALSE;
+	Bootable = FALSE;
+	FileSystem = ""NTFS"";
+	QuickFormat = TRUE;
+	Size = 100;
+	SizeUnits = ""PERCENT"";
+	Type = ""PRIMARY"";
+	VolumeLetterVariable = ""OSDisk"";
+	VolumeName = ""OS"";
+};
+","PartitionStyle: MBR"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "
+"32","Test Group","Convert Disk to Dynamic","SMS_TaskSequence_ConvertDiskAction",,"","True","False","WinPEandFullOS",,,"DiskIndex: 0"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "
+"33","Test Group","Pre-provision BitLocker","SMS_TaskSequence_OfflineEnableBitLockerAction",,"","True","False","WinPE",,,"DestinationDisk: ","DestinationLogicalDrive: ","DestinationPartition: ","DestinationVariable: ","SkipWhenTPMInvalid: True"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "
+"34","Test Group","Setup Windows and ConfigMgr","SMS_TaskSequence_SetupWindowsAndSMSAction",,"","True","False","WinPEandFullOS",,,"ClientInstallProperties: SMSSMP=SMP01.domain.root SMSCACHESIZE=51200","ClientPackageID: CM100002"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "
+"35","Test Group","Capture Operating System Image","SMS_TaskSequence_CaptureSystemImageAction",,"","True","False","WinPE",,,"CaptureDestination: \\server01\share\file.wim","CapturePassword: 	
+","CaptureUsername: domain\user01","ImageCreator: Daniel Ratliff","ImageDescription: For OSD only","ImageVersion: 1.0"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "
+"36","Test Group","Install Roles and Features","BDD_InstallRoles",,"","True","False","WinPEandFullOS",,,"OSFeatures: NetFx3 WCF-TCP-PortSharing45 DirectoryServices-ADAM-Client Microsoft-Hyper-V-Tools-All Microsoft-Hyper-V-Management-Clients Microsoft-Hyper-V-Management-PowerShell MediaPlayback WindowsMediaPlayer FaxServicesClientPackage TelnetClient TelnetServer MicrosoftWindowsPowerShellV2Root MicrosoftWindowsPowerShellV2 Printing-XPSServices-Features Xps-Foundation-Xps-Viewer","OSRoleIndex: 10","OSRoles: ","OSRoleServices: "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "
+"37","Test Group","Install Updates Offline","BDD_InstallUpdatesOffline","CM100015","","True","False","WinPEandFullOS",,," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "

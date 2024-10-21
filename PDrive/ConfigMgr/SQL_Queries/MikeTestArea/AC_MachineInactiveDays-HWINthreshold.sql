@@ -1,0 +1,2 @@
+select uss_MachineInactivityTimeout_Days, uss_HardwareInventoryThreshold
+from dbo.SiteSettings

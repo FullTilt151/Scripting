@@ -1,0 +1,2 @@
+REG DELETE HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Security /f
+REG DELETE HKLM\SOFTWARE\Classes\AppID\{653C5148-4DCE-4905-9CFD-1B23662D3D9E} /f

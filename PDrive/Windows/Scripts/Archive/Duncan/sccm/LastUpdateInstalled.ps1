@@ -1,0 +1,1 @@
+Get-HotFix | Where {$_.InstalledOn} | sort InstalledOn -Descending | select CSname, HotFixID, @{Name="Installed"; Expression={"{0:dd MMMM yyyy}" -f [datetime]$_.InstalledOn.Tostring()}} -First 1

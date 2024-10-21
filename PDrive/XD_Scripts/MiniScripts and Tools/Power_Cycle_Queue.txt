@@ -1,0 +1,8 @@
+Check Power Cycle Queue
+(Get-BrokerHostingPowerAction -MaxRecordCount 10000 -State Pending).Count
+
+Remove Powerig Off/Shutdown
+Get-BrokerHostingPowerAction -MaxRecordCount 10000 -State Pending | Where { $_.Action -eq "TurnOff" -or $_.Action-eq "Shutdown" } | Remove-BrokerHostingPowerAction
+
+Remove All from Queue
+Get-BrokerHostingPowerAction -MaxRecordCount 10000 -State Pending | Remove-BrokerHostingPowerAction

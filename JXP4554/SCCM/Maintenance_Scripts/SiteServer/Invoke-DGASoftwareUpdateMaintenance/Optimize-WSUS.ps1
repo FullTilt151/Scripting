@@ -1,0 +1,2 @@
+$siteCode = (Get-CimInstance -Namespace root\SMS -ClassName SMS_ProviderLocation).SiteCode
+.\Invoke-DGASoftwareUpdateMaintenance -DeclineSuperseded -DeclineLastLevelOnly -ExclusionPeriod 99 -UpdateListOutputFile C:\Temp\WSUSUpdateList.log -RunCleanUpWizard -logFile C:\Temp\WSUSMaintenance.log -ReSyncUpdates -CleanSUGs -CleanSources -SiteCode $SiteCode -DeclineByTitle @('*Itanium*','*Beta*') -RemoveEmptySUGs

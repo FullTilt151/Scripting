@@ -1,0 +1,214 @@
+PingPlotter Script V4.00
+ScriptType=Alert Condition
+Language=VBScript
+This script creates a new alert condition that will notify when crosses some threshold.
+
+Note: This MOS equation is a prototype and should not be relied on to match other methods of calculating this metric.
+---- Do not edit this line, or anything above it ----
+option explicit
+
+' This must be defined and returns the description that will
+' be in the dropdown on the alert screen
+function GetCaption
+  GetCaption = "MOS (Estimate / Approximate)"
+end function
+
+function GetConditionEngine(NewAlertCondition)
+
+  dim NewObject
+
+  set NewObject = new AlertConditionMOS
+  set GetConditionEngine = NewObject
+
+  set NewObject.Self = NewObject
+  set NewObject.Owner = NewAlertCondition
+  
+  ' Set up all the editor events...
+  Events.SetObjectEvent NewAlertCondition, "OnCreateEditor", NewObject, "CreateEditor"
+  Events.SetObjectEvent NewAlertCondition, "OnDoneEditor", NewObject, "DoneEditor"
+  Events.SetObjectEvent NewAlertCondition, "OnAlertToFields", NewObject, "AlertToFields"
+  Events.SetObjectEvent NewAlertCondition, "OnFieldsToAlert", NewObject, "FieldsToAlert"
+  
+  ' Set up other "working" events...
+  Events.SetObjectEvent NewAlertCondition, "OnLoadSettings", NewObject, "LoadSettings"
+  Events.SetObjectEvent NewAlertCondition, "OnSaveSettings", NewObject, "SaveSettings"
+  
+  ' This is the one the gets called a lot - each time the condition needs to be checked!
+  Events.SetObjectEvent NewAlertCondition, "OnCheckHost", NewObject, "CheckHost"
+  
+  ' OK, we're all done - return the object back to the caller and wait for work.
+end function
+
+class AlertConditionMOS
+
+  public Self     ' In case we need to reference ourself for something - just a handy step
+  public Owner    ' The PingPlotter class that is handling conditions.  Has a number of useful properties
+
+  ' Editor fields - make them private, but global class variables so they're easy to access
+  private lblMOSCaption
+  private editMOS
+  
+  ' Variable data - pulled from configuration and used to know when to signal
+  private MOStarget      ' Our MOS target value
+
+  private Sub Class_Initialize( )
+    ' Set up our initial "default" values.
+    MOStarget = 3.0
+  end sub
+
+  private Sub Class_Terminate( )
+    ' Do teardown work for class (if appropriate)
+  end sub
+
+  sub LoadSettings(AlertCondition, IniFile, SectionName)
+    MOStarget = IniFile.ReadFloat( SectionName, "MOS", MOStarget)
+  end sub
+
+  sub SaveSettings(AlertCondition, IniFile, SectionName)
+    IniFile.WriteFloat SectionName, "MOS", MOStarget
+  end sub
+  
+  sub CheckHost(AlertCondition, HostInfo, FirstSampleNum, LastSampleNum, HostStatus)
+    ' AlertCondition - the Delphi object.  Has "Alert", other useful properties
+    ' HostInfo - collected data.  There are no statistics here - just raw data
+    ' FirstSampleNum, LastSampleNum - Based on alert configuration, the range of samples to examine.
+    ' HostStatus - set it to "Pass" or "Fail"
+  
+    ' Here's where we do all the work to see if the alert needs to fire
+    ' or not.
+    dim SampleLoop
+    dim Latency
+    dim LostPackets
+    dim TotalSamples
+    dim OutOfOrder
+    dim Jitter
+    dim CurJitter
+    dim PrevSamp
+    dim CurSample
+    dim PacketLoss
+    dim ConsLosses ' Consecutive Losses
+    
+    PrevSamp = -1
+    Latency = 0
+    LostPackets = 0
+    TotalSamples = 0
+    OutOfOrder = 0  ' Not used yet.  Will be simulated
+    Jitter = 0.0
+    ConsLosses = 0
+
+    for SampleLoop = FirstSampleNum to LastSampleNum
+      CurSample = HostInfo.Items(SampleLoop)
+      
+      if CurSample = ppSAMPLETIMEOUT then
+        LostPackets = LostPackets + 1
+        TotalSamples = TotalSamples + 1
+      elseif (CurSample >= 0) then
+        Latency = Latency + CurSample
+        TotalSamples = TotalSamples + 1
+        
+        ' Calculate Jitter (using an average jitter for the number of samples picked)
+        if (PrevSamp >= 0) then
+          CurJitter = abs(PrevSamp - CurSample)
+          if (CurJitter > 750) then
+            ' If jitter is unreasonably large, cap it.  This make sure a single
+            ' packet that might be called "lost" and comes in very late doesn't
+            ' upset the entire jitter calculation.  Maybe we should call a really
+            ' high jitter packet a lost packet, actually.
+            CurJitter = 750
+          end if
+ 	        Jitter = Jitter + CurJitter
+        end if
+        PrevSamp = CurSample
+      end if
+    next
+    
+    ' We have raw data
+    ' Calculate Jitter
+    if (TotalSamples > 1) then
+      Jitter = Jitter / (TotalSamples - 1)
+    else
+      Jitter = 0
+    end if
+    
+    ' Calculate average latency
+    if (TotalSamples > 0) then
+      Latency = (Latency / TotalSamples) / 2 ' We want one-way latency!
+      PacketLoss = (LostPackets / TotalSamples) * 100
+    else
+      Latency = 0
+      PacketLoss = 0
+    end if
+    
+    ' OK, we have Jitter (in ms), Latency (in ms) and packet loss (in percent).
+    ' Determine the MOS based on these numbers
+    ' ***** NOTE ***** THIS IS SIMULATED FORMULA ONLY!  DO NOT RELY ON THIS!!!
+    dim R
+    dim MOSCalc
+    dim EffLat ' Effective Latency
+    
+    EffLat = (Latency + Jitter * 2 + 10)
+    
+    if EffLat < 160 then
+      R = 93.2 - (EffLat / 40)
+    else
+      R = 93.2 - (EffLat - 120) / 10
+    end if
+
+    ' Now, let's drag in our packet loss
+    R = R - PacketLoss * 2.5
+    
+    if (R < 0) then
+      R = 0
+    end if
+    
+    ' Convert the R into an MOS value.
+    MOSCalc = 1 + (0.035) * R + (.000007) * R * (R-60) * (100-R)
+
+    ' OK, does this pass or fail our test?
+    if (MOSCalc < MOStarget) then
+      HostStatus = Fail
+    else
+      HostStatus = Pass
+    end if
+
+  end sub
+
+  sub CreateEditor(AlertCondition, ControlContainer)
+
+    ' Create a label in the dialog
+    set lblMOSCaption = ControlContainer.CreateAppObject("TLabel")
+
+    ' For a label, we don't need to access it later, so there's no need
+    ' to set a name.  If we want to be able to modify or check the value
+    ' of it later, though, it makes things a lot easier to set a name now
+    ' Label.Name = "lblURLCaption"
+    lblMOSCaption.Parent = ControlContainer
+    lblMOSCaption.Top = 5
+    lblMOSCaption.Caption = "Alert when MOS worse than this value (1.0 to 5.0):"
+    lblMOSCaption.Left = 7
+
+    ' Create the edit control in the dialog
+    set editMOS = ControlContainer.CreateAppObject("TEdit")
+    
+    editMOS.Parent = ControlContainer
+    editMOS.Name = "editMOS" ' Setting a name means we have easy access to it later.
+    editMOS.Text = ""
+    editMOS.Top = 3
+    editMOS.Left = lblMOSCaption.Left + lblMOSCaption.Canvas.TextWidth(lblMOSCaption.Caption) + 5
+    editMOS.Hint = "Typical conditions will yield a MOS value in the 3.5 to 4.2 range.  A value of" & vbCRLF & "5.0 means perfect quality, a value of 1.0 means unusable."
+    editMOS.Width = 50
+
+  end sub
+
+  sub DoneEditor(AlertCondition)
+  end sub
+
+  sub AlertToFields(AlertCondition)
+    editMOS.Text = CStr(MOStarget)
+  end sub
+
+  sub FieldsToAlert(AlertCondition)
+    MOStarget = CCur(editMOS.Text)
+  end sub
+
+end class

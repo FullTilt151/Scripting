@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Configuration>
+    <PrimarySiteServer>LOUAPPWQS1151.RSC.HUMAD.COM</PrimarySiteServer>
+    <!-- Path locally on computer for temporary files and local clienthealth.log if LocalLogFile="True" -->
+    <LocalFiles>C:\temp\ClientHealth</LocalFiles>
+    <!-- Registry key where client health data will be written by the script -->
+    <RegistryKey>HKLM:\Software\ConfigMgrClientHealth</RegistryKey>
+    <Client Name="Version">5.00.8853.1006</Client>
+    <!-- Sitecode specified here will be used in the install/repair scanario for the SMSSITECODE parameter-->
+    <Client Name="SiteCode">WQ1</Client>
+    <Client Name="AutoUpgrade">False</Client>
+    <!-- Cache size defined here will be used in the install/repair scenario for the SMSCACHESIZE parameter-->
+    <Client Name="CacheSize" Value="10240" DeleteOrphanedData="True" Enable="False" />
+    <Client Name="Log" MaxLogSize="4096" MaxLogHistory="1" Enable="False" />
+    <ClientEXEInstallProperty>/MP:LOUAPPWQS1023.RSC.HUMAD.COM</ClientEXEInstallProperty>
+    <ClientEXEInstallProperty>/skipprereq:silverlight.exe</ClientEXEInstallProperty>
+    <ClientMSIInstallProperty>MP=LOUAPPWQS1023.RSC.HUMAD.COM</ClientMSIInstallProperty>
+    <ClientMSIInstallProperty>MP=LOUAPPWQS1024.RSC.HUMAD.COM</ClientMSIInstallProperty>
+    <ClientMSIInstallProperty>MP=LOUAPPWQS1025.RSC.HUMAD.COM</ClientMSIInstallProperty>
+    <ClientMSIInstallProperty>FSP=LOUAPPWQS1023.RSC.HUMAD.COM</ClientMSIInstallProperty>
+    <!-- Level: Full = everything. ClientInstall = only if installation of sccm agent fails.  -->
+    <!-- Enable: Controls File Share logging; LocalLogFile: Controls local logging -->
+    <Log Name="File" Level="Full" MaxLogHistory="8" LocalLogFile="True" Enable="False" />
+    <!-- 
+        An XML file is generated that will ultimately be turned into an DDR. 
+        This controls if it should be anbled, and whether it should be uploaded via SMB or HTTP.
+        The PrimarySiteServer from above is used to determine the appropriate endpoints for the uploads
+    -->
+    <Log Name="DDR" UploadBy="HTTP" Enable="False" />
+    <!-- Valid formats: ClientLocal / UTC  -->
+    <Log Name="Time" Format="ClientLocal" />
+    <!-- Optional check on the ConfigMgr agent if local database is corrupt -->
+    <Option Name="CcmSQLCELog" Enable="True" />
+    <Option Name="LanternAppCI" Enable="True" />
+    <Option Name="DCOM" Fix="True" Enable="True" />
+    <Option Name="StaleLogs" Days="14" Enable="True" />
+    <Option Name="BITSCheck" Fix="True" Enable="True" />
+    <Option Name="ClientSettingsCheck" Fix="True" Enable="True" />
+    <Option Name="DNSCheck" Fix="True" Enable="True" />
+    <Option Name="Drivers" Enable="False" />
+    <Option Name="Updates" Share="\\server.humad.com\ClientHealth$\Updates" Fix="False" Enable="False" />
+    <Option Name="PendingReboot" StartRebootApplication="False" Enable="True" />
+    <Option Name="RebootApplication" Application="\\server.humad.com\ClientHealth$\RebootApp\shutdowntool.exe /t:7200 /m:1440" Enable="False" />
+    <Option Name="MaxRebootDays" Days="7" Enable="False" />
+    <Option Name="OSDiskFreeSpace">10</Option>
+    <Option Name="HardwareInventory" Days="10" Fix="True" Enable="True" />
+    <Option Name="SoftwareMetering" Fix="True" Enable="True" />
+    <!-- Write: if True the script will perform an additional write test for WMI. A class will be created and deleted-->
+    <Option Name="WMI" Fix="True" Write="True" Enable="True"/>
+    <Option Name="RefreshComplianceState" Days="30" Enable="True"/>
+    <Service Name="BITS" StartupType="Manual" State="Running" Uptime=""/>
+    <Service Name="winmgmt" StartupType="Automatic" State="Running" Uptime=""/>
+    <Service Name="wuauserv" StartupType="Automatic" State="Running" Uptime=""/>
+    <Service Name="lanmanserver" StartupType="Automatic" State="Running" Uptime=""/>
+    <Service Name="RpcSs" StartupType="Automatic" State="Running" Uptime=""/>
+    <Service Name="W32Time" StartupType="Automatic" State="Running" Uptime=""/>
+    <Service Name="ccmexec" StartupType="Automatic (Delayed Start)" State="Running" Uptime="7" />
+    <Service Name="lpasvc" StartupType="Manual" State="Running" Uptime=""/>
+    <Service Name="lppsvc" StartupType="Manual" State="Running" Uptime=""/>
+    <Remediation Name="AdminShare" Fix="True" />
+    <Remediation Name="ClientProvisioningMode" Fix="True" />
+    <Remediation Name="ClientStateMessages" Fix="True" />
+    <Remediation Name="ClientWUAHandler" Fix="True" Days="30"/>
+    <Remediation Name="ClientCertificate" Fix="True" />
+</Configuration>

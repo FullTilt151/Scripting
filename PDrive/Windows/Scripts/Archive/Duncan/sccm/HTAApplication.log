@@ -1,0 +1,72 @@
+9/12/2012 16:29:15 - --------------------------------------------------------
+9/12/2012 16:29:15 - Getting the MAC address and SMBIOS GUID of the system
+9/12/2012 16:29:15 - Found MAC Address of active NIC: 00:24:7E:0F:02:4D
+9/12/2012 16:29:15 - Found SMBIOS GUID: D8FE204E-4B50-48FF-5D81-FF743611FFA0
+9/12/2012 16:29:15 - Collection ID of the collection to add this System to:HUM00075
+9/12/2012 16:29:15 - --------------------------------------------------------
+9/12/2012 16:29:15 - Please login above to SCCM.
+9/12/2012 16:29:24 - Entered Provider Account: humad\tdr2928
+9/12/2012 16:29:24 - --------------------------------------------------------
+9/12/2012 16:29:24 - Setting the Configuration Manager Namespace object variables
+9/12/2012 16:29:24 - Successfully connected to the SMS Provider on: LOUAPPWPS207 and set the Configuration Manager Namespace objects 0
+9/12/2012 16:30:25 - --------------------------------------------------------
+9/12/2012 16:30:25 - Getting the MAC address and SMBIOS GUID of the system
+9/12/2012 16:30:25 - Found MAC Address of active NIC: 00:24:7E:0F:02:4D
+9/12/2012 16:30:25 - Found SMBIOS GUID: D8FE204E-4B50-48FF-5D81-FF743611FFA0
+9/12/2012 16:30:25 - Collection ID of the collection to add this System to:HUM00075
+9/12/2012 16:30:25 - --------------------------------------------------------
+9/12/2012 16:30:25 - Please login above to SCCM.
+9/12/2012 16:30:35 - Entered Provider Account: humad\tdr2928
+9/12/2012 16:30:35 - --------------------------------------------------------
+9/12/2012 16:30:35 - Setting the Configuration Manager Namespace object variables
+9/12/2012 16:30:35 - Successfully connected to the SMS Provider on: LOUAPPWPS207 and set the Configuration Manager Namespace objects 0
+9/12/2012 16:32:29 - --------------------------------------------------------
+9/12/2012 16:32:29 - Getting the MAC address and SMBIOS GUID of the system
+9/12/2012 16:32:29 - Found MAC Address of active NIC: 00:24:7E:0F:02:4D
+9/12/2012 16:32:29 - Found SMBIOS GUID: D8FE204E-4B50-48FF-5D81-FF743611FFA0
+9/12/2012 16:32:29 - Collection ID of the collection to add this System to:HUM00075
+9/12/2012 16:32:29 - --------------------------------------------------------
+9/12/2012 16:32:29 - Please login above to SCCM.
+9/12/2012 16:32:37 - Entered Provider Account: humad\tdr2928
+9/12/2012 16:32:37 - --------------------------------------------------------
+9/12/2012 16:32:37 - Setting the Configuration Manager Namespace object variables
+9/12/2012 16:32:37 - Successfully connected to the SMS Provider on: LOUAPPWPS207 and set the Configuration Manager Namespace objects 0
+9/12/2012 16:32:37 - Serial Number = MJDNKN3       
+9/12/2012 16:32:37 - Pick the computer name prefix (or type in custom name), and click "Add Machine Now".
+9/20/2012 10:24:41 AM - --------------------------------------------------------
+9/20/2012 10:24:41 AM - Getting the MAC address and SMBIOS GUID of the system
+9/20/2012 10:24:41 AM - Found MAC Address of active NIC: 1C:65:9D:BB:1F:B0
+9/20/2012 10:24:41 AM - Found SMBIOS GUID: 011AA009-D350-CB11-B39B-C6616BBDD874
+9/20/2012 10:24:41 AM - Collection ID of the collection to add this System to:HUM00075
+9/20/2012 10:24:41 AM - --------------------------------------------------------
+9/20/2012 10:24:41 AM - Please login above to SCCM.
+9/20/2012 10:24:54 AM - Entered Provider Account: humad\tdr2928
+9/20/2012 10:24:54 AM - --------------------------------------------------------
+9/20/2012 10:24:54 AM - Setting the Configuration Manager Namespace object variables
+9/20/2012 10:24:56 AM - Successfully connected to the SMS Provider on: LOUAPPWPS207 and set the Configuration Manager Namespace objects 0
+9/20/2012 10:25:09 AM - Serial Number = R8B38R3       
+9/20/2012 10:25:09 AM - Pick the computer name prefix (or type in custom name), and click "Add Machine Now".
+1/7/2013 09:12:30 - --------------------------------------------------------
+1/7/2013 09:12:30 - Getting the MAC address and SMBIOS GUID of the system
+1/7/2013 09:12:30 - Found MAC Address of active NIC: 00:24:7E:0F:02:4D
+1/7/2013 09:12:30 - Found SMBIOS GUID: D8FE204E-4B50-48FF-5D81-FF743611FFA0
+1/7/2013 09:12:30 - Collection ID of the collection to add this System to:HUM00075
+1/7/2013 09:12:30 - --------------------------------------------------------
+1/7/2013 09:12:30 - Please login above to SCCM.
+1/7/2013 09:13:21 - Entered Provider Account: humad\tdr2928
+1/7/2013 09:13:21 - --------------------------------------------------------
+1/7/2013 09:13:21 - Setting the Configuration Manager Namespace object variables
+1/7/2013 09:13:21 - Successfully connected to the SMS Provider on: LOUAPPWPS207 and set the Configuration Manager Namespace objects 0
+1/7/2013 09:33:19 - --------------------------------------------------------
+1/7/2013 09:33:19 - Getting the MAC address and SMBIOS GUID of the system
+1/7/2013 09:33:19 - Found MAC Address of active NIC: 00:24:7E:0F:02:4D
+1/7/2013 09:33:19 - Found SMBIOS GUID: D8FE204E-4B50-48FF-5D81-FF743611FFA0
+1/7/2013 09:33:19 - Collection ID of the collection to add this System to:HUM00075
+1/7/2013 09:33:19 - --------------------------------------------------------
+1/7/2013 09:33:19 - Please login above to SCCM.
+1/7/2013 09:33:30 - Entered Provider Account: humad\tdr2928
+1/7/2013 09:33:30 - --------------------------------------------------------
+1/7/2013 09:33:30 - Setting the Configuration Manager Namespace object variables
+1/7/2013 09:33:30 - Successfully connected to the SMS Provider on: LOUAPPWPS207 and set the Configuration Manager Namespace objects 0
+1/7/2013 09:33:39 - Serial Number = MJDNKN3       
+1/7/2013 09:33:39 - Pick the computer name prefix (or type in custom name), and click "Add Machine Now".

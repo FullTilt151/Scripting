@@ -1,0 +1,127 @@
+PingPlotter Script V4.00
+ScriptType=Startup
+Language=VBScript
+DefaultEnabled=1
+This script creates a new menu item which will allow you to edit the DNS Name in the trace graph.  Note that this script is
+*very* version specific and works only with PingPlotter Pro V4.0
+---- Do not edit this line, or anything above it ----
+option explicit
+
+' Register ourselves to know about each new target engine that's created
+Events.SetEvent MainForm, "OnNewTargetView", "CreateNewMenuItem"
+Events.SetEvent MainForm, "OnNewSummaryGraph", "CreateNewMenuItem"
+
+
+' This is called each time we create a new target engine.  This also works on the summary
+' graphs.
+sub CreateNewMenuItem(Sender, NewTarget)
+
+  ' This needs to create a new menu item and insert it after the "Clipboard" entry.
+	dim NewMenu
+	
+	' Create the frame as the owner of the menu item, which makes it easy to find the
+	' right frame later.
+
+	set NewMenu = NewTarget.CreateAppObject("TMenuItem")
+
+	NewMenu.Name = "miEditDNSName"
+	NewMenu.Caption = "Edit DNS Name..."
+	Events.SetEvent NewMenu, "OnClick", "EditDNSName"
+	
+	' Insert it right before the "Clipboard" menu option.
+	NewTarget.pmenuGraphRightClick.Items.Insert NewTarget.miClipboard.MenuIndex, NewMenu
+	
+	' Create menu to reresolve the hop.
+	set NewMenu = NewTarget.CreateAppObject("TMenuItem")
+	NewMenu.Name = "miReResolve"
+	NewMenu.Caption = "Re-resolve this hop's name"
+	Events.SetEvent NewMenu, "OnClick", "ReresolveHop"
+	
+	' Insert it right before the "Clipboard" menu option.
+	NewTarget.pmenuGraphRightClick.Items.Insert NewTarget.miClipboard.MenuIndex, NewMenu
+
+end sub
+
+' ---------------------------------------------------------------------
+' Prompt for the new DNS Name
+' ---------------------------------------------------------------------
+sub EditDNSName(Sender)
+  ' User has selected the menu, let's make sure we're on a target that's not a placeholder.
+  
+  ' Sender is the menu.  The Sender's owner is the frame of stuff for this target or the summary graph's frame.
+  dim SelectedHost
+  dim Handled
+  Handled = FALSE
+  
+  set SelectedHost = Sender.Owner.drgrTrace.SelectedHostInfo
+  
+  ' Make sure we have a target selected in the grid.
+  if IsObject(SelectedHost) and (not (SelectedHost is Nothing)) then
+    ' No use having a name without an IP (and it will cause problems if we do).
+    if SelectedHost.IPAddress > "-" then
+      Handled = TRUE
+      dim CurrentName 
+      CurrentName = SelectedHost.HostName
+      ' Prompt for a new name - the new value will be filled in to "CurrentName"
+      if InputQuery("Manually edit name", "Enter new name: ", CurrentName) then
+        ' We don't want an empty name.
+        if (CurrentName > "") and (CurrentName <> SelectedHost.HostName) then
+          if CurrentName = "---" then
+            CurrentName = ""
+          end if
+          SelectedHost.HostName = CurrentName
+          
+          if SelectedHost.IPAddress = SelectedHost.DataCollector.TargetIPAddress then
+            SelectedHost.DataCollector.SpecifiedTargetName = SelectedHost.IPAddress & " " & CurrentName
+            SelectedHost.DataCollector.TargetDescription = SelectedHost.IPAddress & " " & CurrentName
+
+            if (CurrentName > "") then
+              SelectedHost.DataCollector.Resolve ' Need to fix everything up.
+            end if
+          end if
+          SelectedHost.DataCollector.OnDestinationResolved.Notify SelectedHost.DataCollector, SelectedHost
+          Sender.Owner.drgrTrace.Invalidate
+        end if
+      end if
+    end if
+  end if
+  
+  ' If we've selected something that's not a valid rename target, then show a message that it won't work.
+  if (not Handled) then
+    MsgBox "Must select a valid host in the trace graph to rename before this menu option will work."
+  end if
+end sub
+
+' ---------------------------------------------------------------------
+' Clear out the current DNS name for the selected hop and re-resolve it
+' ---------------------------------------------------------------------
+sub ReresolveHop(Sender)
+ 
+  ' Sender is the menu.  The Sender's owner is the frame of stuff for this target.
+  dim SelectedHost
+  dim Handled
+  
+  set SelectedHost = Sender.Owner.drgrTrace.SelectedHostInfo
+  
+  ' Make sure we have a target selected in the grid.
+  if IsObject(SelectedHost) and (not (SelectedHost is Nothing)) then
+    ' No use having a name without an IP (and it will cause problems if we do).
+    if SelectedHost.IPAddress > "-" then
+      if SelectedHost.IPAddress = SelectedHost.DataCollector.TargetIPAddress then
+        SelectedHost.DataCollector.SpecifiedTargetName = SelectedHost.IPAddress
+        SelectedHost.DataCollector.TargetDescription = SelectedHost.IPAddress
+	      SelectedHost.DataCollector.Resolve
+	      
+	      SelectedHost.HostName = ""  ' Need to clear it the current name or the lookup won't work
+	      Sender.Owner.drgrTrace.Invalidate ' Make the grid refresh so the name clears itself
+	      SelectedHost.DataCollector.LGetHostByAddress SelectedHost.IPAddress, 0
+      else
+	      SelectedHost.HostName = ""  ' Need to clear it the current name or the lookup won't work
+	      Sender.Owner.drgrTrace.Invalidate ' Make the grid refresh so the name clears itself
+	      SelectedHost.DataCollector.LGetHostByAddress SelectedHost.IPAddress, 0
+	    end if
+      SelectedHost.DataCollector.OnDestinationResolved.Notify SelectedHost.DataCollector, SelectedHost
+    end if
+  end if
+end sub
+

@@ -1,0 +1,1 @@
+@nltest /server:%1 /dsgetsite

@@ -1,0 +1,46 @@
+PingPlotter Script V4.00
+ScriptType=Startup
+Language=VBScript
+DefaultEnabled=1
+This script changes the DNS resolution logic so that the summary screen uses the specified DNS name, rather
+than the looked up one, if possible.
+---- Do not edit this line, or anything above it ----
+option explicit
+
+' Register ourselves to know about each new target engine that's created
+Events.SetEvent MainForm, "OnNewTraceTarget", "CreateNewTarget"
+
+' This is called each time we create a new target engine.  
+sub CreateNewTarget(Sender, NewTarget)
+  ' Need to handle all name resolutions...
+  Events.SetEvent NewTarget.DataCollector, "OnDestinationResolved", "DNSLookupDone"
+  
+  ' Also need to handle any datasets that are loading (in case it was created in a
+  ' different environment).
+  Events.SetEvent NewTarget.DataCollector, "OnSampleSetLoaded", "OnNewDataLoaded"
+end sub
+
+sub DNSLookupDone(DataCollector, NewTarget)
+  ' If it's a hop, NewTarget will be defined, if it's the main DNS resolution that's
+  ' done, then it will be empty.
+	if IsObject(NewTarget) then
+	  if (not (NewTarget is Nothing)) then
+  	  ' If the new target is the final destination and it needs to be changed, change it.
+	    if (NewTarget.IPAddress = DataCollector.TargetIPAddress) and (NewTarget.HostName <> DataCollector.TargetDNSName) and (DataCollector.TargetDNSName <> dnsRESOLVING) then
+	      NewTarget.HostName = DataCollector.TargetDNSName
+	    end if
+	  end if
+	end if
+end sub
+
+sub OnNewDataLoaded(DataCollector)
+  dim FinalDestination
+  set FinalDestination = DataCollector.CollectingHostList.FinalDestination
+  if IsObject(FinalDestination) then
+    if (not (FinalDestination is Nothing)) then
+	    if (FinalDestination.IPAddress = DataCollector.TargetIPAddress) and (FinalDestination.HostName <> DataCollector.TargetDNSName) then
+	      FinalDestination.HostName = DataCollector.TargetDNSName
+	    end if
+	  end if
+  end if
+end sub

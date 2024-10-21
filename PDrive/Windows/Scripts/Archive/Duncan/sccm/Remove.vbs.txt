@@ -1,0 +1,93 @@
+ 
+Option Explicit
+' Constants for type of event log entry
+const EVENTLOG_INFORMATION = 4
+
+
+Dim Args  
+Dim swbemLocator, SWbemServices, objCollection, oProviderLocation, oLocation   
+Dim strComputerName, arrComputers, objComputer, sCollectionIDs
+Dim objDirectRule
+Dim strmessage, objshell
+Dim seventlog, sClearPxeflag
+
+On Error Resume Next  
+
+
+'CollectionIDs from which to remove the computer
+'Should an eventlog entry be generated, set Seventlog=1
+
+sEventlog = "1" 
+sCollectionIDs = "M0100336:M0100243"  
+'sCollectionIDs = "M0100243" 
+
+'------------------------------------------------------------
+'Get Command Line arguments
+
+Set args = WScript.Arguments
+strComputername = args.Item(0)
+
+
+If strComputerName = NULL then
+   wscript.quit
+End if
+
+'------------------------------------------------------------
+'Main script 
+
+set objShell = CreateObject("WScript.Shell")
+
+    Set swbemLocator = CreateObject("WbemScripting.SWbemLocator")
+    swbemLocator.Security_.AuthenticationLevel = 6 'Packet Privacy.
+    Set swbemServices = swbemLocator.ConnectServer(".", "root\SMS")
+    Set oProviderLocation = swbemServices.InstancesOf("SMS_ProviderLocation")
+    For Each oLocation In oProviderLocation
+        If oLocation.ProviderForLocalSite = True Then
+            Set swbemServices = swbemLocator.ConnectServer(oLocation.Machine, "root\sms\site_" + oLocation.SiteCode)
+        End If        
+    Next 
+
+Set arrComputers = SWbemServices.ExecQuery("select * from SMS_R_System where Name='" & strComputerName & "'")
+
+For Each objComputer In arrComputers
+   RemoveCollectionMembership objComputer.ResourceID
+   
+'Write to eventlog if Seventlog = 1   
+   If Seventlog = "1" then
+   strMessage = strcomputername & " will be removed from the following collection ID's " & scollectionids
+   objShell.LogEvent EVENTLOG_INFORMATION, strMessage
+   End IF
+   
+Next
+
+
+Set objCollection = Nothing
+Set SWbemServices = Nothing
+Set SWbemLocator = Nothing
+
+
+Wscript.Quit
+
+
+'------------------------------------------------
+Sub RemoveCollectionMembership(intresourceid)
+on error resume next
+
+Dim mCollectionID, i
+mCollectionID = Split (sCollectionIDs, ":")
+for i = Lbound(mCollectionID) to UBound(mCollectionID)
+
+	Set objCollection = SWbemServices.Get("SMS_Collection='" & MCollectionID(i) & "'")
+	Set ObjDirectRule = SWbemServices.Get("SMS_CollectionRuleDirect").SpawnInstance_
+	ObjDirectRule.ResourceID = intresourceid
+	ObjCollection.DeleteMembershipRule objDirectRule
+	next
+End Sub
+
+
+
+'------------------------------------------------
+
+
+
+WScript.Quit(0)  

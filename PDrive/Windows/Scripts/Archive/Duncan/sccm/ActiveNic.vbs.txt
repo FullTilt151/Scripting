@@ -1,0 +1,9 @@
+strComputer = "."
+Set objWMIService = GetObject("winmgmts:\\" & strComputer & "\root\cimv2")
+Set colItems = objWMIService.ExecQuery("Select * from Win32_NetworkAdapter Where NetConnectionStatus = 2")
+For Each objItem in colItems
+    sActiveName = objItem.Name
+    sMacAddress = objItem.MacAddress
+    Wscript.Echo "Network Card - " & sActiveName
+    Wscript.Echo "MAC Address - " & sMacAddress
+next

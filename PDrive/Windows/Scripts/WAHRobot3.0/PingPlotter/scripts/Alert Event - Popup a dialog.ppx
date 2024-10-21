@@ -1,0 +1,159 @@
+PingPlotter Script V4.00
+ScriptType=Alert Event
+Language=VBScript
+DefaultEnabled=false
+This is an example alert event.  Popup modal dialogs are not friendly, so this isn't a good alert for general 
+use.  It is a good example, though, if you want to build your own alert event.
+---- Do not edit this line, or anything above it ----
+option explicit
+
+' This must be defined and returns the description that will
+' be in the dropdown on the alert screen
+function GetCaption
+  GetCaption = "Pop up a dialog"
+end function
+
+function GetEventEngine(NewAlertEvent)
+
+  dim NewObject
+  
+  set NewObject = new AlertEventPopupDialog
+  set GetEventEngine = NewObject
+
+  set NewObject.Self = NewObject
+  set NewObject.OwningEvent = NewAlertEvent
+  
+  ' Set up the notification for loading the settings (called when an alert is created)
+  Events.SetObjectEvent NewAlertEvent, "OnLoadSettings", NewObject, "LoadSettings"
+
+  ' "SignalEvent" is called when PingPlotter wants this event to "do its thing".  This
+  ' is where you do whatever action this event is supposed to do.  
+  Events.SetObjectEvent NewAlertEvent, "OnSignalEvent", NewObject, "SignalEvent"
+  
+  ' Editor Events
+  
+  ' CreateEditor will create the fields that will be embedded in the alert form for editing
+  Events.SetObjectEvent NewAlertEvent, "OnCreateEditor", NewObject, "CreateEditor"
+  
+  ' Copy the data from the alert itself into the edit fields.
+  Events.SetObjectEvent NewAlertEvent, "OnAlertToFields", NewObject, "AlertToFields"
+  
+  ' Copy the data from edit fields back to the alert
+  Events.SetObjectEvent NewAlertEvent, "OnFieldsToAlert", NewObject, "FieldsToAlert"
+  
+  ' Save the alert data into the persistent storage mechanism (probably alerts.ini).
+  ' Note that you don't need to worry about where it's stored - just write it to 
+  ' the IniFile object that's passed in.
+  Events.SetObjectEvent NewAlertEvent, "OnSaveSettings", NewObject, "SaveSettings"
+
+end function
+
+' Each alert instance will get a new object so it can persist settings.  We're going
+' to put these all in a class to make it easy.
+class AlertEventPopupDialog
+
+  public Self
+  public OwningEvent
+  
+  ' The internal fields for this alert event.  Your event will have different
+  ' internal fields (DialogMessage is specific).
+  public DialogMessage
+
+  ' The editor fields
+  private Label
+  private Edit1
+  private Button
+
+  private Sub Class_Initialize( )
+
+    ' Set up the default message that will show up when a new event is created.    
+    DialogMessage = "The alert event fired!"
+  end sub
+
+  private Sub Class_Terminate( )
+    ' Do teardown work for class
+  end sub
+
+  ' We're passed an INIFile object.  Read the values and put it in the alert event object
+  sub LoadSettings(AlertEvent, IniFile, SectionName)
+    DialogMessage = IniFile.ReadString( SectionName, "DialogMessage", DialogMessage )
+  end sub
+
+  ' Save our settings out to the INIFile  
+  sub SaveSettings(AlertEvent, IniFile, SectionName)
+    IniFile.WriteString SectionName, "DialogMessage", DialogMessage
+  end sub
+  
+  ' Called when PingPlotter is about to display the editor - this needs to create
+  ' whatever user interface this event needs.  The "ControlContainer" should be
+  ' the parent for anything created.  It's a windows control with a handle, so
+  ' you should be able to create just about anything an put it on here.  Of course,
+  ' VBScript doesn't have full easy access to the Windows API, so other languages
+  ' might be easier here.
+  sub CreateEditor(ControlContainer)
+
+    ' Create a label in the dialog
+    set Label = ControlContainer.CreateAppObject("TLabel")
+
+    ' For a label, we don't need to access it later, so there's no need
+    ' to set a name.  If we want to be able to modify or check the value
+    ' of it later, though, it makes things a lot easier to set a name now
+    ' Label.Name = "lblURLCaption"
+    Label.Parent = ControlContainer
+    Label.Top = 5
+    Label.Caption = "Message to display:"
+    Label.Left = 3
+
+    set Button = ControlContainer.CreateAppObject("TButton")
+    Button.Parent = ControlContainer
+    Button.Name = "btnTest"
+    Button.Caption = "Test"
+    Button.Width = 60
+    Button.Anchors = SetMake(akTop, akRight)
+    Button.Left = ControlContainer.ClientWidth - Button.Width - 5
+    Button.Top = 1
+    Button.Hint = "Show the popup message"
+    Events.SetObjectEvent Button, "OnClick", Self, "Test"
+
+    ' Create the edit control in the dialog
+    set Edit1 = ControlContainer.CreateAppObject("TEdit")
+
+    Edit1.Parent = ControlContainer
+    Edit1.Name = "editMessage" ' Setting a name means we have easy access to it later.
+    Edit1.Text = ""  ' Initizlize this to blank - we don't have config settings yet.
+    Edit1.Top = 3
+    Edit1.Left = Label.Left + Label.Canvas.TextWidth(Label.Caption) + 2
+    Edit1.Anchors = SetMake(akTop, akLeft, akRight)
+    Edit1.Width = ControlContainer.Width - Edit1.Left - 10 - Button.Width
+
+    ' If we don't set the Container height, PingPlotter will do it for us.  For this
+    ' example, we'll set it ourself, though.
+    ControlContainer.Height = Edit1.Top + Edit1.Height + 3
+  end sub
+
+  ' Copy the alert event values into the edit fields
+  sub AlertToFields(ControlContainer)
+    if IsObject(Edit1) then
+      Edit1.Text = DialogMessage
+    end if
+  end sub
+
+  ' Copy the edit field values to the alert event
+  sub FieldsToAlert(ControlContainer)
+    if IsObject(Edit1) then
+      DialogMessage = Edit1.Text
+    end if
+  end sub
+
+  sub Test(Sender)
+    FieldsToAlert(Sender.Parent) ' Sender is the button - the container is the parent
+    SignalEvent(OwningEvent)
+  end sub  
+
+  ' Do our event!  For this example, this is a popup dialog box.  This could create a COM
+  ' object to do SMS notification, or any other actions as needed.
+  sub SignalEvent(AlertEvent)
+    MsgBox SubstiteHostInfoMask(DialogMessage, AlertEvent.MonitoredHost, TRUE)
+  end sub
+
+end class

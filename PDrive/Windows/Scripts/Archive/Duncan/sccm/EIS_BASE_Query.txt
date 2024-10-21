@@ -1,0 +1,49 @@
+select  LTRIM(RTRIM(SMS.Name))  AS [HST],
+SMS.SMSID  AS [ItemKey],
+[DVSN] = (select top 1 SerialNumber0 from v_GS_PC_BIOS where v_GS_PC_BIOS.ResourceID = SMS.MachineID order by RevisionID desc) ,
+[CHT] =  (select TOP 1 CASE ChassisTypes0
+ when 1 then 'Other'
+ when 2 then 'Unknown'
+ when 3 then 'Desktop'
+ when 4 then 'Low Profile Desktop'
+ when 5 then 'Pizza Box'
+ when 6 then 'Mini Tower'
+ when 7 then 'Tower'
+ when 8 then 'Portable'
+ when 9 then 'Laptop'
+ when 10 then 'Notebook'
+ when 11 then 'Hand Held'
+ when 12 then 'Docking Station'
+ when 13 then 'All in One'
+ when 14 then 'Sub Notebook'
+ when 15 then 'Space-Saving'
+ when 16 then 'Lunch Box'
+ when 17 then 'Main System Chassis'
+ when 18 then 'Expansion Chassis'
+ when 19 then 'SubChassis'
+ when 20 then 'Bus Expansion Chassis'
+ when 21 then 'Peripheral Chassis'
+ when 22 then 'Storage Chassis'
+ when 23 then 'Rack Mount Chassis'
+ when 24 then 'Sealed-Case PC'
+ else 'Unknown'
+END
+FROM v_GS_SYSTEM_ENCLOSURE where  v_GS_SYSTEM_ENCLOSURE.ResourceID = SMS.MachineID  order by RevisionID desc
+) ,
+ SMS.UserDomainName + '\' + SMS.UserName  AS [LLU],
+[HOS] =(
+SELECT TOP 1  CAST(REPLACE(Caption0, 'Microsoft ', '') 
+                         + ' ' + (CASE CSDVersion0 WHEN 'Service Pack 1' THEN 'SP 1' WHEN 'Service Pack 2' THEN 'SP 2' WHEN 'Service Pack 3' THEN 'SP 3'
+                          WHEN 'Service Pack 4' THEN 'SP 4' WHEN 'Service Pack 5' THEN 'SP 5' END) AS VARCHAR(255)) from v_GS_OPERATING_SYSTEM WHERE v_GS_OPERATING_SYSTEM.ResourceID = SMS.MachineID
+						  order by RevisionID desc
+) ,
+ SMS.Domain  AS [ADC],
+[VNDR] =  (SELECT TOP 1 Manufacturer0 from v_GS_PC_BIOS where v_GS_PC_BIOS.ResourceID = SMS.MachineID order by RevisionID desc
+) ,
+[MOD] =  (SELECT TOP 1 Model0 from v_GS_COMPUTER_SYSTEM where v_GS_COMPUTER_SYSTEM.ResourceID = SMS.MachineID order by RevisionID desc
+) ,
+Convert(VarChar(20), SMS.LastActiveTime, 120) as [LCD],
+SMS.ClientVersion as [SCCMV]
+from vSMS_CombinedDeviceResources SMS
+where SMS.IsClient = 1
+and SMS.IsObsolete = 0

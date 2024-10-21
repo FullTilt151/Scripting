@@ -1,0 +1,1 @@
+﻿(Get-WmiObject -Computer LOUXDWRPATA02 -Class Win32_OperatingSystem).caption

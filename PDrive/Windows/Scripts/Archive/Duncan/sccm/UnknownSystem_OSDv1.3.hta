@@ -1,0 +1,922 @@
+﻿<!--   
+-----------------------------------------------------------------------
+ Copyright © Microsoft Corporation.  All rights reserved.
+
+ THIS CODE SAMPLE IS MADE AVAILABLE TO YOU WITHOUT WARRANTY OF ANY KIND
+ AND CONFERS NO RIGHTS ON YOU WHATSOEVER EXCEPT THE RIGHT TO REVIEW IT
+ SOLELY AS A REFERENCE.  THE ENTIRE RISK OF USE OR RESULTS FROM USE OF 
+ THIS CODE SAMPLE REMAINS WITH YOU.
+-----------------------------------------------------------------------
+-->
+
+<!--
+ This HTA application 
+            creates a machine record for the unknown system that it is run on,
+            adds the machine to the specified collection,
+            sets Machine and Task Sequence variables.
+ Usage:
+     Run this HTA on the unknown system for which a machine record is to be created.
+     mshta.exe UnknownSystem.HTA <Provider Machine Name>
+                                 <Provider Site Code>
+                                 <Collection ID to add the system to>
+-->
+
+<html>
+<head>
+<title>Unknown System</title>
+
+<HTA:APPLICATION ID="oHTA"
+     APPLICATIONNAME="Unknown System"
+     SCROLL="yes"
+     SINGLEINSTANCE="yes"
+     WINDOWSTATE="maximize"
+     SYSMENU="yes"
+>
+
+<script language="vbscript">
+
+' Making Option explicit to ensure that all the variables are declared before usage.
+'Option Explicit
+
+' Global Constants.
+' If this is true, the log is shown in the reverse chronological order 
+' (the latest log entry at the top)in the UI.
+' Set this to false if you want otherwise.
+Const RECENTLOGONTOP = True
+
+' Global Variables.
+' Logging related variables.
+Dim isLogHidden : isLogHidden = False
+Dim logFileSystemObject : logFileSystemObject = Null
+' Command line arguments.
+Dim providerName, provSiteCode, collectionIDToAddTo
+' SMS Provider namespace objects.
+Dim smsSiteNamespace : smsSiteNamespace = Null
+Dim isSMSSiteNamespaceSet : isSMSSiteNamespaceSet = False
+Dim machineMACAddress, machineSMBIOSGuid
+' Variables used across functions.
+Dim computerName, providerAccount, providerPassword
+Dim returnVal
+Dim serialNumber
+' Subroutine that executes as soon as the window is loaded.
+Sub Window_Onload
+    ' Create the log file as the first step so that all the logs below are
+    ' recorded in the UI and the file.
+    CreateLogFile ()
+     
+    providerName = "LOUAPPWPS207"
+    provSiteCode = "HUM"
+    collectionIDToAddTo = "HUM00075"
+    ' Get the MAC and SMBIOS GUID of the system.
+    Log ("--------------------------------------------------------")
+    Log ("Getting the MAC address and SMBIOS GUID of the system")
+    machineMACAddress = GetMACAddress ()
+    machineSMBIOSGuid = GetSMBIOSGuid ()
+    oCollectionSet = ""
+    'Retrieve Serial Number
+    WmicQuerySerialNumber ()
+    Log ("Collection ID of the collection to add this System to:" & collectionIDToAddTo)
+    ' Ask the user to enter the input.
+    Log ("--------------------------------------------------------")
+    Log ("Please login above to SCCM.")
+End Sub
+
+' Function executed when the "Add Machine Now" button is clicked.
+' Imports the machine, adds it to a collection, adds machine and Task sequence variables.
+Function Main
+	' Get the input from the UI.
+    computerName = UCASE(GetComputerName) 
+	' Validate the input.
+    If computerName = "" OR (Not IsValidComputerName(computerName)) Then
+        Log ("The computer name entry is invalid. Please provide the needed information.")
+        Exit Function
+    End If
+
+
+	'Place the Collection ID chosen in the dropdown into a variable
+	'''''collectionIDToAddTo = Collection1.Value
+	   
+	' Delete the machine record if it exists
+	CleanupComputerObjectForLocalPCBySMBIOSGuid smsSiteNamespace
+	
+     ' Create the machine record and add it to a collection.
+     Log ("--------------------------------------------------------")
+     Log ("Importing this unknown system into Configuration Manager")
+     ' Variable to store the ResourceID of this unknown system to be used in the functions later.
+     Dim machineResourceID: machineResourceID = 0
+     returnVal = CreateMachineRecord (computerName , machineSMBIOSGuid , machineMACAddress , collectionIDToAddTo, machineResourceID)
+     If returnVal <> 0 Then
+         Log ("Failed to create machine record with error: " & returnVal & ".")
+     ' Close the log file handle before exiting.
+         logFileSystemObject.Close
+         logFileSystemObject = null        
+         Main = returnVal
+         Exit Function
+     End If
+     
+     ' Add the machine to the collection.
+     ' You may have a Task Sequence to deploy an Operating System advertised to this collection and 
+     ' available on media and PXE.
+     Log ("--------------------------------------------------------")
+     Log ("Adding this machine to the specified collection")
+     returnVal = AddMachineToCollection (machineResourceID, collectionIDToAddTo)
+     If returnVal <> 0 Then
+         Log ("Failed to add the machine to the collection with error: " & returnVal & ".")
+         ' Close the log file handle before exiting.
+         logFileSystemObject.Close
+         logFileSystemObject = null        
+         Main = returnVal
+         Exit Function
+     End If
+         
+     ' Configuration Manager might take some time till the machine shows up as part of the collection
+     ' depending on the size of the site and the number of clients etc.
+     ' Wait till the machine is part of the collection so that when this HTA is closed, the Task Sequence
+     ' (if any) assigned to the collection (and available on media and PXE) starts.
+     returnVal = VerifyCollectionForResource (collectionIDToAddTo, machineResourceID)
+     If returnVal <> 0 Then
+         Log ("The machine with Resource ID =" & machineResourceID & " is still not part of the" & " collection ID: " & collectionIDToAddTo)
+         ' Close the log file handle before exiting.
+         logFileSystemObject.Close
+         logFileSystemObject = null        
+         Main = returnVal
+         Exit Function
+ 	   End If
+     
+     'Wipe the disk
+     WipeDisk ()
+     
+     Log ("--------------------------------------------------------")
+     Log ("Please wait for this window to close in 10 seconds... Then proceed")
+ 	   Sleep (12 * 1000)
+ 	   window.close()
+End Function
+
+Function ConnectToSCCM
+    ' Re-initialize some global variables (may be set from previous run)
+    smsSiteNamespace = Null
+    isSMSSiteNamespaceSet = False
+
+    ' Get the input from the UI.
+    providerAccount = GetProviderAccount 
+    providerPassword = GetProviderPassword 
+	If providerAccount = "" Then
+        Log ("The user account entry is invalid. Please provide the needed information.")
+        Exit Function
+    End If
+ ' Connect to the provider and set the Configuration Manager namespace objects.
+    Log ("--------------------------------------------------------")
+    Log ("Setting the Configuration Manager Namespace object variables" )
+    returnVal = SetConfigMgrNamespaceObjects (provSiteCode, providerName, providerAccount, providerPassword)
+    ' If the Configuration Manager namespace objects are not set, exit the script.
+    If isSMSSiteNamespaceSet = False Then
+        Log ("Failed to set the Configuration Manager Namespace objects.")
+        Log ("Incorrect credentials? Please try again.")
+        ' Close the log file handle before exiting.
+        logFileSystemObject.Close
+        logFileSystemObject = null
+        ToggleVisible "login"
+        'Main = 1
+        Exit Function
+    Else
+        SaveImagedByUser UCASE(TRIM(providerAccount))
+        CheckForBootCD ()
+        SerialNumber = GetSerialNumber ()
+        ToggleVisible "proceed"
+        divSN.innerHTML = SerialNumber
+        Log ("Pick the computer name prefix (or type in custom name), and click " & CHR(34) & "Add Machine Now" & CHR(34) & ".")
+    End If
+	
+    
+End Function
+
+
+Function GetSerialNumber()
+    Dim fileSystem, completeSnPath, snSystemObject, retval, snLine
+    Set fileSystem = CreateObject ("Scripting.FileSystemObject")
+    completeSnPath = fileSystem.GetAbsolutePathName (".") & "\sn.txt"
+    retval = ""
+    snLine = -1
+    ' ForReading = 1
+    If fileSystem.FileExists(completeSnPath) Then
+        Set snSystemObject = fileSystem.OpenTextFile (completeSnPath, 1, True, -2)
+        Dim arrFileLines()
+        i = 0 
+        Do Until snSystemObject.AtEndOfStream 
+            Redim Preserve arrFileLines(i)
+            arrFileLines(i) = snSystemObject.ReadLine	              
+            IF TRIM(arrFileLines(i)) = "SerialNumber" THEN
+            	snLine = (i + 1)
+            END IF
+            i = i + 1
+        Loop
+        snSystemObject.Close
+        
+        If (snLine > -1) Then
+            retval = arrFileLines(snLine)
+        Else
+            retval = ""
+        End If
+        Log("Serial Number = " & retval)
+    End If
+    GetSerialNumber = retval
+
+End Function
+
+Function WmicQuerySerialNumber()
+    Dim fileSystem, completeSnPath, snSystemObject, objShell, ShellCmd, retval
+    Set fileSystem = CreateObject ("Scripting.FileSystemObject")
+    completeSnPath = fileSystem.GetAbsolutePathName (".") & "\sn.txt"
+    ShellCmd = "cmd /c wmic bios get serialnumber > " & completeSnPath
+    Set objShell = CreateObject ("Wscript.shell")
+    objShell.run ShellCmd
+    Set objShell = Nothing
+
+End Function
+
+Function AddExistingComputersBySMBIOSGuid(smsSiteNamespace)
+	On Error Resume Next
+	AddExistingComputersBySMBIOSGuid = -1
+	Log "Checking for old computer objects via GUID: " & machineSMBIOSGuid
+	sQuery = "SELECT * FROM SMS_R_System WHERE SMBIOSGUID = '" & machineSMBIOSGuid & "' And Obsolete = 0 And Active = 1 And Client = 1"
+	' Process the query
+	Set oClients = smsSiteNamespace.ExecQuery(sQuery)
+	For Each oClient In oClients
+		If oClient.SMBIOSGUID = machineSMBIOSGuid Then
+			Err.Clear
+			machineResourceID = oClient.ResourceID
+			'Get the computer settings object.
+			Log "Adding computer object name to collection: " & oClient.Name & " resourceID: " & oClient.ResourceID & " via SMBIOSGUID: " & machineSMBIOSGuid
+    			AddExistingComputersBySMBIOSGuid = AddMachineToCollection (oClient.ResourceID, collectionIDToAddTo)
+			If Err.Number <> 0 Then
+				Log "Add to Collection Error: " & Err.Description & " - Number: " & Err.Number	
+				Err.Clear
+			Else
+			   returnVal = VerifyCollectionForResource (collectionIDToAddTo, machineResourceID)
+			   If returnVal <> 0 Then
+		        	Log ("The machine with Resource ID =" & machineResourceID & " is still not part of the" & " collection ID: " & collectionIDToAddTo)
+                  	' Close the log file handle before exiting.
+		        	logFileSystemObject.Close
+        		   	logFileSystemObject = null        
+        		   	Main = returnVal
+        		   	Exit Function
+			   End If
+    
+    			   Log ("--------------------------------------------------------")
+    			   Log ("Please wait for this window to close in 10 seconds... Then proceed")
+			   Sleep (12 * 1000)
+	             window.close()
+			End If
+		Else
+			Log "No matching SMBIOSGUID found."
+		End If
+	Next
+End Function
+
+
+' Delete any resources with this SMBIOSGuid
+Function CleanupComputerObjectForLocalPCBySMBIOSGuid(smsSiteNamespace)
+	'On Error Resume Next
+	Log "Checking for old computer objects via GUID: " & machineSMBIOSGuid
+	sQuery = "SELECT * FROM SMS_R_System WHERE SMBIOSGUID = '" & machineSMBIOSGuid & "'"
+	' Process the query
+	Set oClients = smsSiteNamespace.ExecQuery(sQuery)
+	For Each oClient In oClients
+		If oClient.SMBIOSGUID = machineSMBIOSGuid Then
+			Err.Clear
+			'Get the computer settings object.
+			Log "Deleting computer object name: " & oClient.Name & " resourceID: " & oClient.ResourceID & " via SMBIOSGUID: " & machineSMBIOSGuid
+			oClient.Delete_
+			If Err.Number <> 0 Then
+				Log "Delete Error: " & Err.Description & " - Number: " & Err.Number	
+				Err.Clear
+			End If
+		Else
+			Log "No matching SMBIOSGUID found."
+		End If
+	Next
+End Function
+
+Function FillInCollections(smsSiteNamespace)
+	'Check if the user has connected to SCCM
+	If isSMSSiteNamespaceSet = "False" Then
+		msgbox "You must first login to SCCM before proceeding",48
+		Exit Function
+	End If
+	strStandingAdvertID = "HUM00075"
+	' Build the query and execute it - Get all of the SubCollections under Standing Adverts Collection 
+	strColQuery="Select SMS_Collection.Name, SMS_Collection.CollectionID " & _ 
+	"From SMS_CollectToSubCollect INNER JOIN SMS_Collection " & _ 
+	"On SMS_CollectToSubCollect.SubCollectionID = SMS_Collection.CollectionID " & _ 
+	"Where SMS_CollectToSubCollect.parentCollectionID=" & Chr(34) & strStandingAdvertID & Chr(34) & _ 
+	"Order By SMS_Collection.Name"
+	set oCollectionSet = smsSiteNamespace.ExecQuery(strColQuery) 
+	' Check to see if returned No Records 
+		if oCollectionSet.Count = 0 then 
+			msgbox "Query returned 0 records" 
+		else 
+		' Write each one to an <option> tag for the dropdown list
+			'document.write("<Option Value=" & Chr(34) & "-1" & Chr(34) & " Select> Select a package</Option>") 
+			for each oCollection in oCollectionSet 
+				Set objOption = Document.createElement("OPTION")
+				objOption.Text = oCollection.Name
+				objOption.Value = oCollection.CollectionID
+				Collection1.Add(objOption)
+			next
+		end if 
+End Function
+
+' Show/Hide the log.
+Function ShowHideLog()
+    If isLogHidden = True Then
+        isLogHidden = False
+        logTextArea.style.display = "block"
+        showHideLogButton.value = "Hide Log"
+    Else
+        isLogHidden = True
+        logTextArea.style.display = "none"
+        showHideLogButton.value = "Show Log"
+    End If 
+End Function
+
+' Create/Open the log file.
+Function CreateLogFile()
+    ' Form the complete file path to save the log.
+    Dim fileSystem, completeLogFilePath
+    Set fileSystem = CreateObject ("Scripting.FileSystemObject")
+    completeLogFilePath = fileSystem.GetAbsolutePathName (".") & "\HTAApplication.log"
+
+    ' Create the file and write the log to it.
+    ' ForAppending = 8
+    Set logFileSystemObject = fileSystem.OpenTextFile (completeLogFilePath, 8, True)
+    
+    ' Set the return value to the log file path
+    CreateLogFile = completeLogFilePath
+End Function
+
+' Logs the given input into the UI and the log file.
+Function Log(logEntry)
+    ' Prepend current time to the input log entry.
+    Dim lineOfLog, consolidatedLog
+    lineOfLog = Now & " - " & logEntry 
+    
+    ' If the log file is not created or opened, do it now.
+    If (IsNull (logFileSystemObject) = True) Then
+        Dim logFileName
+        
+        ' Update the UI log alone to say that the log file is being created.
+        logTextArea.value = logTextArea.value & vbcrlf & "Creating the log file to store the logs"
+        logFileName = CreateLogFile ()
+        
+        ' Update the UI log alone to say that the log file was successfully created.
+        logTextArea.value = logTextArea.value & vbcrlf & "Successfully created the log file " & logFileName
+    End If
+    
+    ' If the log file is created, add the log to the end of the log file.
+    ' The log in the log file is always chronological, i.e. the latest log at the end of the file.
+    If (IsNull (logFileSystemObject) = False) Then
+        logFileSystemObject.WriteLine (lineOfLog)
+    End If
+    
+    ' Add the log to the UI.
+    ' If RECENTLOGONTOP is true, make the new entry to be the topmost one in the UI.
+    If RECENTLOGONTOP = True Then
+        consolidatedLog = lineOfLog & vbcrlf & logTextArea.value
+    Else
+        consolidatedLog = logTextArea.value & vbcrlf & lineOfLog
+    End If
+    logTextArea.value = consolidatedLog
+    Log = consolidatedLog
+    divCurrentStatus.innerHTML = logEntry
+End Function
+
+' Create and set Configuration Manager provider objects.
+Function SetConfigMgrNamespaceObjects(siteCode, providerName, providerAccount, providerPassword)
+    Dim locator
+    
+    ' Check if the smsSiteNamespace is not previously set.
+    If isSMSSiteNamespaceSet = False Then
+        ' Connect to the SMS\Site_<Sitecode> namespace on the provider machine.
+        Set locator = CreateObject ("WbemScripting.SWbemLocator")
+        On Error Resume Next
+        Set smsSiteNamespace = locator.ConnectServer (providerName, "root\sms\site_" & siteCode, providerAccount, providerPassword )
+        If Err <> 0 Then
+            Log ("Failed to connect to SMS provider. (" & Err.number & ")")
+            LogExtendedError ()
+            Exit Function
+        End If
+        On Error Goto 0
+        
+        ' Setting ImpersonationLevel = impersonate and AuthenticationLevel = PktPrivacy.
+        smsSiteNamespace.Security_.ImpersonationLevel = 3
+        smsSiteNamespace.Security_.AuthenticationLevel = 6
+        Log ("Successfully connected to the SMS Provider on: " & providerName & " and set the Configuration Manager Namespace objects " & Err.number)
+        isSMSSiteNamespaceSet = True
+    Else
+        Log ("Configuration Manager Namespace object variables are already set")
+    End If
+End Function
+
+' Import the machine into Configuration Manager.
+Function CreateMachineRecord(computerName, smBiosGuid, macAddress, collectionID, ByRef resourceID)
+    On Error Resume Next    
+    
+    ' Get the parameters for the ImportMachineEntry method.
+    Dim smsSite
+    Set smsSite = smsSiteNamespace.Get ("SMS_Site")
+    If Err <> 0 Then
+        Log ("Failed to connect to SMS_Site object. (" & Err.number & ")")
+        CreateMachineRecord = Err
+        LogExtendedError ()
+        Exit Function
+    End If
+    
+    ' Create ImportMachineEntry method's input parameter instance.
+    Dim inParam
+    Set inParam = smsSite.Methods_("ImportMachineEntry").inParameters.SpawnInstance_()
+    If Err <> 0 Then
+        Log ("Failed to create ImportMachineEntry method's input parameter instance. (" & Err.number & ")")
+        CreateMachineRecord = Err
+        LogExtendedError ()
+        Exit Function
+    End If
+    ' Set the input parameters.
+    
+    ' Set the machine name for this system.
+    inParam.Properties_.item("NetBiosName") = computerName
+    ' Set the SMBIOSGUID.
+    inParam.Properties_.item("SMBIOSGUID") = smBiosGuid
+    ' Set the MAC Address.
+    inParam.Properties_.item("MACAddress") = macAddress
+    ' Set OverwriteExistingRecord to false to not overwrite the existing entry in Configuration Manager.
+    ' If the system is already known to Configuration Manager, then the record for this system will exist.
+    inParam.Properties_.item("OverwriteExistingRecord") = False
+    
+    ' Execute the ImportMachineEntry method.
+    Dim outParams
+    Set outParams = smsSite.ExecMethod_("ImportMachineEntry", inParam) 
+    If Err <> 0 Then
+        Log ("Failed to add the machine """ & computerName & """. (" & Err.number & ")")
+        CreateMachineRecord = Err
+        LogExtendedError ()
+        Exit Function
+    End If
+    On Error Goto 0
+    
+    ' Check the ImportMachineEntry method's return value.
+    If outParams.Properties_.item("ReturnValue") <> 0 Then
+        Log ("Failed to add " & computerName & ". (" & outParams.Properties_.item("ReturnValue") & ")")
+        CreateMachineRecord = outParams.Properties_.item("ReturnValue")
+        Exit Function
+    End If
+    
+    ' Log success since the ReturnValue is 0.
+    ' Verify if the system already exists in the Configuration Manager.
+    If outParams.Properties_.item("MachineExists") = True Then
+        ' This machine is already present.
+        Log ("Machine with MAC: " & macAddress & " and SMBIOS GUID:" & smBiosGuid & " already exists in " & "Configuration Manager. Its Resource ID = " & outParams.Properties_.item("ResourceID"))
+        
+        ' Get the computer name by which this machine is present in Configuration Manager.
+        Dim machineRecord
+        Set machineRecord = smsSiteNamespace.Get ("SMS_R_System.ResourceId='" &_
+                                                 outParams.Properties_.item("ResourceID") & "'")
+        If Err <> 0 Then
+            Log ("Failed to find machine with Resource ID " & outParams.Properties_.item("ResourceID") & ". (" & Err.number & ")")
+            CreateMachineRecord = Err
+            LogExtendedError ()
+            Exit Function
+        End If
+        
+        ' Get the machine name.
+        Dim machineName 
+        machineName = machineRecord.Properties_.item("Name")
+        Log ("It exists with a computer name '" & machineName & "'")
+    Else
+        Log ("Successfully added machine '" & computerName & "'. Resource ID = " & outParams.Properties_.item("ResourceID"))
+    End If
+    
+    ' Set the ByRef parameter resourceID.
+    resourceID = outParams.Properties_.item("ResourceID")
+
+    ' Set the return value.
+    CreateMachineRecord = 0
+End Function
+
+
+' Add the machine to the specified collection.
+Function AddMachineToCollection(resourceID, collectionID )
+    On Error Resume Next
+    
+    ' Get the machine with the given resource ID.
+    Dim machineRecord
+    Set machineRecord = smsSiteNamespace.Get ("SMS_R_System.ResourceId='" & resourceID & "'")
+    If Err <> 0 Then
+        Log ("Failed to find machine with Resource ID " & resourceID & ". (" & Err.number & ")")
+        AddMachineToCollection = Err
+        LogExtendedError ()
+        Exit Function
+    End If
+    'On Error Goto 0
+    
+    ' Get the machine name and convert resourceID to an int to be used in further queries.
+    Dim machineName
+    machineName = machineRecord.Properties_.item("Name")
+    'resourceID = CInt (resourceID)
+
+    ' Get the collection with the given collection ID.
+    Dim collection
+    Set collection = smsSiteNamespace.Get ("SMS_Collection.CollectionID='" & collectionID & "'")
+    If Err <> 0 Then
+        Log ("Failed to find collection " & collectionID & ". (" & Err.number & ")")
+        AddMachineToCollection = Err
+        LogExtendedError ()
+        Exit Function
+    End If
+    RuleSet = collection.CollectionRules
+    For Each Rule In RuleSet
+    		If Err Then
+		'Do nothing
+		Else
+	    		If Rule.Path_.Class = "SMS_CollectionRuleDirect" Then  
+    				If Rule.ResourceID = sResourceID Then  
+            			Log(machineName  & " is already in collection " & collection.Name)
+            			Exit Function
+	        		End If  
+    			End If  
+    		End If
+	Next
+	If Err Then
+		Err.Clear
+	End If 
+	      
+    ' Setup the collection rule.
+    Dim collectionRule 
+    Set collectionRule = smsSiteNamespace.Get ("SMS_CollectionRuleDirect").SpawnInstance_()
+    If Err <> 0 Then
+        Log ("Failed to create a SMS_CollectionRuleDirect instance. (" & Err.number & ")")
+        AddMachineToCollection = Err
+        LogExtendedError ()
+        Exit Function
+    End If
+    ' Set the collection rule properties.
+    ' Setting the collection rule based on the system properties, hence ResourceClassName = "SMS_R_System".
+    collectionRule.ResourceClassName = "SMS_R_System"
+    ' Give the rule a name. Using the machine name itself here.
+    collectionRule.RuleName = machineName
+    ' Set the ResourceID to the resource ID of the machine.
+    collectionRule.ResourceID = resourceID
+   
+    ' Execute the AddMembershipRule method to add the machine to the collection.
+    Dim inParam, outParams
+    Set inParam = collection.Methods_("AddMembershipRule").inParameters.SpawnInstance_()
+    ' Set the input parameters.
+    inParam.Properties_.item("collectionRule") = collectionRule
+    ' Execute the AddMembershipRule method.
+    Set outParams = collection.ExecMethod_("AddMembershipRule", inParam) 
+    If Err <> 0 Then
+        Log ("Failed to add " & machineName & "to the Collection " & collectionID & ". (" & Err.number & ")")
+        AddMachineToCollection = Err
+        LogExtendedError ()
+        Exit Function
+    End If
+    On Error Goto 0
+      
+    ' Return success.
+    Log ("Successfully added '" & machineName & "' to collection " & collectionID & ".")
+    AddMachineToCollection = 0
+End Function
+
+' Gets the MAC Address of the active NIC from WMI.
+Function GetMACAddress
+    ' Connect to the root\cimv2 namespace and execute a WMI query.
+    Dim cimv2Namespace, enabledNICs
+    Set cimv2Namespace = GetObject ("winmgmts:{impersonationLevel=impersonate," & "authenticationLevel=pktPrivacy}!\\.\root\cimv2")
+    Set enabledNICs = cimv2Namespace.ExecQuery ("Select * From Win32_NetworkAdapterConfiguration Where IPEnabled = True")
+    If Err <> 0 Then
+        Log ("Failed to get the enabled NICs on the machine.(" & Err.number & ")")
+        GetMACAddress = Err
+        LogExtendedError ()
+        Exit Function
+    End If
+    
+    ' Read the MAC address on the last enabled NIC.
+    Dim item, mac
+    For Each item in enabledNICs
+        mac = item.MACAddress		
+        Log ("Found MAC Address of active NIC: " & mac)
+    Next
+    
+    GetMACAddress = mac
+	
+End Function
+
+' Gets the machine's SMBIOS GUID.
+Function GetSMBIOSGuid
+    ' Connect to the root\cimv2 namespace and execute a WMI query.
+    Dim cimv2Namespace, results
+    Set cimv2Namespace = GetObject ("winmgmts:{impersonationLevel=impersonate," & "authenticationLevel=pktPrivacy}!\\.\root\cimv2")    
+    Set results = cimv2Namespace.ExecQuery ("SELECT UUID FROM Win32_ComputerSystemProduct")
+       
+    ' Process the results of the query.
+    Dim record, smbiosGUID
+    For Each record in results    
+        smbiosGUID = record.UUID
+        Log ("Found SMBIOS GUID: " & smbiosGUID)
+        ' Filter out bad SMBIOS Guids.
+        If smbiosGUID = "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" Or _
+           smbiosGUID = "00000000-0000-0000-0000-000000000000" Then
+            smbiosGUID = ""
+        End If
+    Next
+    
+    ' Return Result.
+     GetSMBIOSGuid = smbiosGUID
+End Function
+
+' Function to validate if the machine with the given resource ID is part of the given collection.
+Function VerifyCollectionForResource(collectionID, resourceID)
+    Dim iterationNumber : iterationNumber = 0
+    Dim isResourcePartOfCollection : isResourcePartOfCollection = False
+   
+    ' Be in a loop until the resource is not part of the collection and iterationNumber < 30         
+    ' Setting the maximum iterations to 30, i.e. setting the maximum time to 30*10 seconds, 5 minutes.
+    ' Tune this iteration number based on your site size.
+    Do While isResourcePartOfCollection = False And iterationNumber < 30
+        Dim wqlQuery, wqlResult
+
+        On Error Resume Next 
+        
+        ' Form the WQL query to verify if the resource is part of the collection.   
+        wqlQuery = "select * from SMS_FullCollectionMembership where CollectionID='" & collectionID & "' AND ResourceID='" & resourceID & "'" 
+        
+        ' Execute the query and verify the number of records in the resultset.
+        Set wqlResult = smsSiteNamespace.ExecQuery (wqlQuery)
+
+        If wqlResult.Count = 0 Then
+            ' No records in the resultset. The machine is not part of the collection yet.
+            Log ("Waiting for system with ResourceID: " & resourceID &_
+                 " to show up in Collection: " & collectionID & ". (Error = " & Err.number & ")")
+            isResourcePartOfCollection = False
+            
+            ' Sleep for 10 seconds before rechecking
+            Sleep (10 * 1000)
+        Else
+            Log ("Found Machine with ResourceID " & resourceID & " in Collection " & collectionID)
+            isResourcePartOfCollection = True
+        End If  
+        
+        On Error Goto 0                
+        
+        ' Increase the iteration count
+        iterationNumber = iterationNumber + 1
+    Loop
+    
+    If (isResourcePartOfCollection = True) Then
+        ' Resource is part of the collection. Return 0.
+        VerifyCollectionForResource = 0
+    Else
+        ' Resource is still not part of the collection. Return 1.
+        VerifyCollectionForResource = 1
+    End If
+    
+End Function
+
+' Subroutine to simulate Sleep in .HTA
+Sub Sleep(milliSecs)
+    CONST HIDEWINDOW = 0
+    CONST WAITFORCOMPLETION = TRUE
+    Dim cmdToPing
+
+    ' Because HTA doesn't use Windows Script Host, it uses IE Script Host we
+    ' can't use WScript.Sleep
+    ' Workaround: send one ping command to fake address with a wait for reply
+    ' value set in milliseconds
+    cmdToPing = "cmd /c ping 1.1.1.1 -n 1 -w " & milliSecs
+    With CreateObject("WScript.Shell")
+        .Run cmdToPing, HIDEWINDOW, WAITFORCOMPLETION
+    End With
+End Sub
+
+' This function logs the additional error information from the WMI and SMS error objects.
+Function LogExtendedError
+    On Error Resume Next
+    
+    Dim extendedStatus
+    Set extendedStatus = CreateObject ("WbemScripting.SWBEMLastError")
+     
+    ' Determine the type of error.
+    If extendedStatus.Path_.Class = "__ExtendedStatus" Then
+        Log ("WMI Error: " & extendedStatus.Description)
+    ElseIf extendedStatus.Path_.Class = "SMS_ExtendedStatus" Then
+        Log ("SMS Provider Error")
+        Log ("Description: " & extendedStatus.Description)
+        Log ("Error Code:  " & extendedStatus.ErrorCode)
+    End If
+    
+    On Error Goto 0
+End Function 
+
+' Functions to read the UI.
+
+' Get the entered computer name.
+Function GetComputerNameOld
+    Log ("Entered Computer Name: " & txtComputerName.value )
+    GetComputerName = txtComputerName.value
+End Function
+
+Function GetComputerName 
+    Dim sn, txtName
+    txtName = txtComputerName.value
+    If txtName = "" Then
+          txtName = txtNamePrefix.value & UCASE(TRIM(SerialNumber))
+    End If
+      
+    Log ("Computer Name: " & txtName)
+    GetComputerName = txtName
+    
+End Function
+
+' Get the entered Provider Account.
+Function GetProviderAccount 
+    Log ("Entered Provider Account: " & txtProviderAccount.value )
+    GetProviderAccount = txtProviderAccount.value
+End Function
+
+' Get the entered Provider Account's Password.
+Function GetProviderPassword 
+    GetProviderPassword = txtProviderPassword.value
+End Function
+
+Function WipeDisk
+	Log ("Wiping MBR on disk...")
+	Set objShell = CreateObject("Wscript.Shell")
+    objShell.Run "x:\Deploy\Scripts\MbrFix.exe /drive 0 fixmbr /yes"
+    Sleep (5*1000)
+End Function
+
+Function IsValidComputerName(txtName)
+	DIM arrInvalidChars, arrReservedNames, reAllDigits, IsValid
+	IsValid = true
+	arrInvalidChars = array("/", "\", CHR(32), CHR(34), ":", "*", "?", "<", ">", "|", ".")
+	arrReservedNames = array("ANONYMOUS" ,"AUTHENTICATED USER" ,"BATCH" ,"BUILTIN" ,"CREATOR GROUP" ,"CREATOR GROUP SERVER" ,"CREATOR OWNER" ,"CREATOR OWNER SERVER" ,"DIALUP" ,"DIGEST AUTH" ,"INTERACTIVE" ,"INTERNET" ,"LOCAL" ,"LOCAL SYSTEM" ,"NETWORK" ,"NETWORK SERVICE" ,"NT AUTHORITY" ,"NT DOMAIN" ,"NTLM AUTH" ,"NULL" ,"PROXY" ,"REMOTE INTERACTIVE" ,"RESTRICTED" ,"SCHANNEL AUTH" ,"SELF" ,"SERVER" ,"SERVICE" ,"SYSTEM" ,"TERMINAL SERVER" ,"THIS ORGANIZATION" ,"USERS" ,"WORLD")
+	reAllDigits = "^[0-9]+$"
+	
+	'Check for any invalid characters in the name
+	FOR EACH char1 IN arrInvalidChars
+		IF InStr(txtName, char1) > 0 THEN
+			Log("Invalid character found in computer name, " & CHR(34) & char1 & CHR(34) & ", change and try again.")
+			IsValid = false
+		END IF
+	NEXT
+	
+	'Check the list of reserved words
+	FOR EACH name1 IN arrReservedNames
+		IF UCASE(txtName) = UCASE(name1) THEN
+			Log("Invalid computer name, reserved word by Microsoft Windows, change and try again.")
+			IsValid = false
+		END IF
+	NEXT
+	
+	Set re = New RegExp
+	re.IgnoreCase = True
+	re.Global = True
+	re.Pattern = reAllDigits
+	If (re.Test(txtName)) Then
+		Log("Invalid computer name, cannot be all digits, change and try again.")
+		IsValid = false
+	End If
+
+	
+	IsValidComputerName = IsValid
+End Function
+
+Function ToggleVisible(txtState)
+	If txtState = "login" Then
+     	divComputerName.style.visibility = "hidden"
+     	divComputerNameLabel.style.visibility = "hidden"
+     End If
+	
+	If txtState = "proceed" Then
+     	divComputerName.style.visibility = "visible"
+     	divComputerNameLabel.style.visibility = "visible"
+     End If
+End Function
+
+Function SaveImagedByUser(txtUser)
+	Dim fileSystem, fileext, myDrive, filePath, ForWriting
+	myDrive = "X:"
+	Set fileSystem = CreateObject ("Scripting.FileSystemObject")
+     If fileSystem.DriveExists(myDrive) Then
+     	filePath= myDrive & "\ImagedByUser.txt"
+     	ForWriting = 2
+     	Set fileext = fileSystem.OpenTextFile(filePath, ForWriting, True) 
+     	fileext.WriteLine(txtUser)
+     	fileext.Close
+     	Set fileext = Nothing
+	End If
+	Set fileSystem = Nothing
+End Function
+
+Function CheckForBootCD()
+     on error resume next
+     dim o, fso, colCD, BootFromCD, d, ft
+     BootFromCD = 0
+     set fso = CreateObject("Scripting.FileSystemObject")
+     set o = GetObject("winmgmts:\\.\root\cimv2")
+     set colCD = o.ExecQuery("select * from Win32_CDROMDrive")
+     For Each oCD in colCD
+     	drv = oCD.Drive
+     	wscript.echo "CD-ROM at " & drv
+     	if fso.DriveExists(drv) then
+     		set d = fso.GetDrive(drv)
+     		if (d.IsReady) Then
+     			If fso.FolderExists(drv & "\SMS") Then
+     				wscript.echo "Found SMS Folder"
+     				BootFromCD = 1
+     			ELSE
+     				wscript.echo "SMS Folder not found"
+     			End If
+     		End If
+     	End if
+     Next
+     If (BootFromCD) Then
+     	Set ft = fso.CreateTextFile("x:\BootFromCD.txt", True)
+     	ft.WriteLine("SMS CD found")
+     	ft.Close
+     End If
+End Function
+
+</script>
+</head>
+<Body bgcolor=#C0C0C0>
+<TABLE border="4" style="border-top-style: solid; border-right-style: solid; border-left-style: solid; border-bottom-style: solid; position: static; width: 100%; height: 100%;">
+    <tr>
+        <td style="height: 21px; text-align: center;">
+            <strong style="vertical-align: bottom; text-align: center">Humana Operating System Deployment
+                </strong>
+         </td>
+    </tr>
+    <tr>
+      <td style="height: 337px">
+          <table border="2" width="100%" height="100%">
+            <TR>
+              <TD style="width: 572px; height: 82px; border-right: thin solid; border-top: thin solid; border-left: thin solid; border-bottom: thin solid;">
+                  <strong>Provider Credentials and Computer Name<br />
+                  </strong>
+                  <hr style="width: 159%"/>
+                  <table >
+                    <tr>
+                      <td>SCCM Login</td>
+                      <td ><input type="text" maxlength="256" id="txtProviderAccount" style="width: 328px" value="humad\"></td>
+                    </tr>
+                    <tr>
+                      <td>Password</td>
+                      <td ><input type="password" maxlength="256" id="txtProviderPassword" style="width: 327px" value=""><br /></td>
+                    </tr>
+                    <tr>
+                    	<td colspan="2"><input id=ConnectButton  class="button" type="button" value="Login to SCCM" name="Connect_Button"  onClick="ConnectToSCCM"><hr /></td>
+                    </tr>
+                    <tr>
+                    	<td><div id="divComputerNameLabel" style="visibility:hidden;">Computer Name<br />
+                    		<em>(must match in Active Directory if joining domain)</em></div></td>
+                    	<td>
+                    		<div id=divComputerName style="visibility:hidden;"><table border="2"><tr><td><table border="0">
+                              <tr>
+                                <td>
+                                Standard name: <select id="txtNamePrefix" style="width: 100px">
+            					<option value="WK" selected>WK</option>
+            					<option value="TR">TR</option>
+						<option value="WKMECA">WKMECA</option>
+            				</select><div id=divSN style="display:inline;" />
+                                </td>
+                              </tr>
+                              <tr>
+                              	<td><center><em>or</em></center></td>
+                              </tr>
+                              <tr>
+                                <td>Custom name: 
+                                <input type="text" id="txtComputerName" style="width: 200px" maxlength="15" value="">
+                                
+                                </td>
+                              </tr>
+                    		</table></td></tr>
+                    		<tr><td><input id=runButton class="button" type="button" value="Add Machine Now" name="run_button"  onClick="Main"></td></tr></table></div>
+                    	</td>
+                    </tr>
+                  </table>
+               </TD>
+          </TR>
+          </table>
+      </td>
+    </tr>
+    <tr>
+    	<td><table border="1" width="100%" bgcolor="#F2F5A9"><tr><td><center><strong>Current Status</strong></center><div id="divCurrentStatus" /></td></tr></table></td>
+    </tr>
+    <TR>
+        <TD style="width: 572px" width="100%"><center><strong>Status Log</strong></center>
+            <textarea  title="Logs" id="logTextArea" rows="10" style="width:100%" readonly="readOnly" ></textarea>
+        </TD>
+    </TR>
+    </TABLE>
+</Body>
+</html>
