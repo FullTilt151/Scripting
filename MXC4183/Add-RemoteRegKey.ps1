@@ -1,4 +1,4 @@
-#Add a reg key to a remove system....
+#Add a reg key to a remove system....;;;;;;.
 Get-Content C:\Temp\Servers.txt | ForEach-Object {
 $regFile = @"
  Windows Registry Editor Version 5.00
