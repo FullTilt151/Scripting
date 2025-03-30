@@ -1,4 +1,4 @@
-﻿#Get AD/AAD Info
+﻿#Get AD/AAD Info00
 $machine = read-host "Please enter the WKID:"
 $MBR = Get-ADComputer -Identity $WKID -Properties MemberOf,OperatingSystemVersion
 $MBR.MemberOf
